@@ -1,0 +1,204 @@
+/* ==========================================================
+   ATI SLIATE Unofficial Results Portal - Mobile & Responsive
+   ========================================================== */
+
+@media (max-width: 768px) {
+  .header-container {
+    height: 60px;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .search-hero {
+    padding: var(--space-6) 0 var(--space-4);
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .search-input-group {
+    flex-direction: column;
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .search-input {
+    width: 100%;
+    text-align: center;
+    padding: var(--space-3) var(--space-2);
+    font-size: 1rem;
+  }
+
+  .search-icon-wrapper {
+    display: none;
+  }
+
+  .btn-search {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+    padding: var(--space-3);
+  }
+
+  .student-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .student-card {
+    padding: var(--space-4);
+  }
+
+  .student-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 1.25rem;
+  }
+
+  .student-name {
+    font-size: 1.125rem;
+  }
+
+  .student-meta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .performance-hero-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cgpa-stat-card {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .cgpa-number {
+    font-size: 2rem;
+  }
+
+  .action-toolbar {
+    flex-direction: column;
+  }
+
+  .btn-action {
+    width: 100%;
+    padding: var(--space-3);
+  }
+
+  /* Transform table to stacked cards on mobile */
+  .grade-table thead {
+    display: none;
+  }
+
+  .grade-table, .grade-table tbody, .grade-table tr, .grade-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .grade-table tr {
+    margin-bottom: var(--space-3);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .grade-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .grade-table td:last-child {
+    border-bottom: none;
+  }
+
+  .grade-table td::before {
+    content: attr(data-label);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .grade-table td.col-code {
+    justify-content: flex-start;
+    padding-bottom: 4px;
+    font-size: 0.8125rem;
+  }
+
+  .grade-table td.col-code::before {
+    display: none;
+  }
+
+  .grade-table td.col-title {
+    font-weight: 700;
+    font-size: 0.9375rem;
+    justify-content: flex-start;
+    padding-top: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .grade-table td.col-title::before {
+    display: none;
+  }
+
+  /* Modal Mobile Adaptations */
+  .modal-card {
+    max-height: 94vh;
+    border-radius: var(--radius-lg);
+  }
+
+  .modal-header {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .modal-body {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .modal-footer {
+    padding: var(--space-3) var(--space-4);
+    flex-direction: column;
+  }
+
+  .modal-footer .btn-action {
+    width: 100%;
+  }
+
+  .generator-controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-nav {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* Small mobile devices (< 400px) */
+@media (max-width: 400px) {
+  .student-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .badge-unofficial {
+    display: none; /* Keep header minimal on ultra small screens */
+  }
+}

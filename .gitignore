@@ -1,0 +1,43 @@
+# ==========================================
+# ATI SLIATE Unofficial Results Portal - .gitignore
+# ==========================================
+
+# STRICT PRIVACY: NEVER commit raw student grades or spreadsheet files!
+data/raw/
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.ods
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment & secrets
+.env
+.env.local
+.env.*.local
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build / Scratch logs
+*.log
+scratch/
+tmp/

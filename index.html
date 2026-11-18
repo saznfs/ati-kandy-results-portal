@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ATI SLIATE Unofficial Results Portal &amp; Social Share Generator</title>
+  <meta name="description" content="Unofficial community results portal for ATI SLIATE students. View 4-semester GPA and exam results, download PDF statements, and generate social share cards.">
+  <meta name="theme-color" content="#0f2b5c">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ATI SLIATE Unofficial Results Portal">
+  <meta property="og:description" content="View ATI SLIATE results, calculate GPA, download PDF records, and create aesthetic social media share cards.">
+  <meta property="og:image" content="assets/images/logo-placeholder.svg">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ATI SLIATE Unofficial Results Portal">
+  <meta name="twitter:description" content="Unofficial community results portal for SLIATE students.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+
+  <!-- Modular CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <!-- External Libraries: jsPDF, AutoTable, Canvas Confetti -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js" defer></script>
+
+  <!-- Modular Application Scripts -->
+  <script src="js/config.js" defer></script>
+  <script src="js/crypto.js" defer></script>
+  <script src="js/security.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/pdfGenerator.js" defer></script>
+  <script src="js/socialCardGenerator.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <!-- Header & Navigation -->
+  <header class="site-header" role="banner">
+    <div class="container header-container">
+      <a href="index.html" class="brand-link" aria-label="ATI SLIATE Results Portal Home">
+        <div class="brand-logo-wrapper">
+          <img id="siteLogo" src="assets/images/sliate-logo.png" alt="Academic Emblem" class="brand-logo" width="44" height="44">
+        </div>
+        <div class="brand-info">
+          <div class="brand-title">
+            <span>ATI Results</span>
+            <span class="badge-unofficial" title="Not affiliated with SLIATE or Government of Sri Lanka">
+              <span aria-hidden="true">ℹ️</span> Unofficial Portal
+            </span>
+          </div>
+          <span class="brand-subtitle">Student Community Results &amp; Social Share</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="btn-theme-toggle" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">
+          <!-- Sun Icon (Dark Mode Active) -->
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon Icon (Light Mode Active) -->
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main id="main-content" role="main">
+    <!-- Search Hero Section -->
+    <section class="search-hero" aria-labelledby="heroTitle">
+      <div class="container">
+        <h1 id="heroTitle" class="hero-title">ATI SLIATE Results Portal</h1>
+        <p class="hero-desc">
+          Search your 4-semester examination results by Index Number, download an unofficial PDF result certificate, and generate aesthetic social cards for Instagram, WhatsApp, and LinkedIn.
+        </p>
+
+        <!-- Search Form Card -->
+        <div class="search-form-card">
+          <form id="searchForm" role="search" aria-label="Student Index Search">
+            <div class="search-input-group">
+              <div class="search-icon-wrapper" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+
+              <input
+                type="text"
+                id="indexInput"
+                class="search-input"
+                placeholder="e.g. AMP/IT/2021/F/0001"
+                autocomplete="off"
+                spellcheck="false"
+                required
+                aria-label="Enter your Student Index Number"
+              >
+
+              <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input" title="Clear input">
+                ✕
+              </button>
+
+              <button type="submit" id="searchBtn" class="btn-search">
+                <span>Search Results</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Sample Quick-Fill Chips -->
+          <div class="sample-indices-wrap">
+            <span class="sample-label">Try sample indices:</span>
+            <button type="button" class="chip-sample" data-sample="AMP/IT/2021/F/0001">AMP/IT/2021/F/0001</button>
+            <button type="button" class="chip-sample" data-sample="AMP/IT/2021/F/0042">AMP/IT/2021/F/0042</button>
+            <button type="button" class="chip-sample" data-sample="COL/IT/2021/F/0105">COL/IT/2021/F/0105</button>
+            <button type="button" class="chip-sample" data-sample="KAN/IT/2021/F/0078">KAN/IT/2021/F/0078</button>
+            <button type="button" class="chip-sample" data-sample="GAL/IT/2021/F/0022">GAL/IT/2021/F/0022</button>
+          </div>
+
+          <!-- Alert / Error Banner -->
+          <div id="alertBox" class="alert-box" role="alert" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section (Populated dynamically) -->
+    <section class="container">
+      <div id="resultsContainer" class="results-container" aria-live="polite">
+        <!-- Rendered by js/ui.js -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Social Share Card Generator Modal -->
+  <div id="socialModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTitle" class="modal-title">✨ Create Social Share Card</h2>
+        <button type="button" id="modalCloseBtn" class="modal-close-btn" aria-label="Close modal" title="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Live Preview Canvas -->
+        <div class="canvas-preview-container">
+          <canvas id="socialCardCanvas" width="1080" height="1920"></canvas>
+        </div>
+
+        <!-- Customization Controls -->
+        <div class="generator-controls-grid">
+          <!-- Aspect Ratio -->
+          <div class="control-group">
+            <span class="control-label">Card Format</span>
+            <div class="segmented-control" role="group" aria-label="Card Format">
+              <button type="button" class="active" data-aspect="9:16">📱 9:16 Story</button>
+              <button type="button" data-aspect="1:1">🖼️ 1:1 Post</button>
+            </div>
+          </div>
+
+          <!-- Theme Palette -->
+          <div class="control-group">
+            <span class="control-label">Theme Style</span>
+            <div class="segmented-control" role="group" aria-label="Theme Palette">
+              <button type="button" class="active" data-theme-choice="navy">Navy</button>
+              <button type="button" data-theme-choice="emerald">Emerald</button>
+              <button type="button" data-theme-choice="onyx">Onyx</button>
+              <button type="button" data-theme-choice="crimson">Crimson</button>
+            </div>
+          </div>
+
+          <!-- Privacy Controls -->
+          <div class="control-group">
+            <span class="control-label">Privacy Options</span>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="toggleShowGrades" checked>
+                <span>Include Distinction Subjects</span>
+              </label>
+              <label class="toggle-switch-label">
+                <input type="checkbox" id="toggleShowRegNo">
+                <span>Display Registration Number</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btnDownloadPng" class="btn-action btn-action-primary">
+          <span>📥 Download High-Res PNG</span>
+        </button>
+        <button type="button" id="btnShareCard" class="btn-action btn-action-gold">
+          <span>📲 Share to Socials</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer & Legal Disclaimer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <!-- Prominent Non-Government Disclaimer -->
+      <div class="footer-disclaimer-card">
+        <div class="disclaimer-title">
+          <span>⚠️</span>
+          <span>Important Non-Government Notice</span>
+        </div>
+        <p class="disclaimer-text">
+          Unofficial portal for viewing and social sharing only. Not affiliated with SLIATE or the Government of Sri Lanka. For official transcripts, contact your ATI administration.
+        </p>
+      </div>
+
+      <div class="footer-nav">
+        <div>
+          <span>&copy; 2026 ATI SLIATE Student Community Portal. Built for students, by students.</span>
+        </div>
+        <div class="footer-links">
+          <a id="reportIssueLink" href="#" target="_blank" rel="noopener noreferrer">Report Issue / Request Result Removal</a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Project</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

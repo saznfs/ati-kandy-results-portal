@@ -1,0 +1,15 @@
+# robots.txt for ATI SLIATE Unofficial Results Portal
+# Prevent web search engines from crawling the encrypted or raw student data directories
+
+User-agent: *
+Disallow: /data/
+Disallow: /data/raw/
+Disallow: /data/encrypted/
+Disallow: /scripts/
+
+# Allow static assets and main pages
+Allow: /
+Allow: /index.html
+Allow: /assets/
+Allow: /css/
+Allow: /js/
