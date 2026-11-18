@@ -151,7 +151,7 @@ $gradePoints = @{
     "C+" = 2.30; "C" = 2.00; "C-" = 1.70;
     "D+" = 1.30; "D" = 1.00; "E" = 0.00;
     "I(SE)" = 0.00; "I(CA)" = 0.00; "DFR" = 0.00;
-    "AB" = 0.00; "INC" = 0.00; "*" = 0.00
+    "AB" = 0.00; "INC" = 0.00; "NE" = 0.00; "*" = 0.00
 }
 
 $students = @{}
@@ -260,7 +260,7 @@ foreach ($idx in $students.Keys) {
             if ($c.gradePoint -gt 0) {
                 $totCreditsEarned += $c.credits
             }
-            if ($c.grade -in @("I(SE)", "I(CA)", "AB", "E", "INC", "DFR")) {
+            if ($c.grade -in @("I(SE)", "I(CA)", "AB", "E", "INC", "DFR", "NE")) {
                 $hasAnyPending = $true
             }
             if ($c.grade -eq "*") {
@@ -269,7 +269,7 @@ foreach ($idx in $students.Keys) {
         }
     }
 
-    $cgpa = if ($hasAnyWithheld) { 0.0 } elseif ($totGpaCredits -gt 0) { [Math]::Round($totQP / $totGpaCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
+    $cgpa = if ($totGpaCredits -gt 0) { [Math]::Round($totQP / $totGpaCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
     $student["cgpa"] = $cgpa
     $student["totalCreditsEarned"] = $totCreditsEarned
     $student["totalCreditsAttempted"] = $totGpaCredits

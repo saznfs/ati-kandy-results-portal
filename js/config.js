@@ -46,7 +46,8 @@ const CONFIG = {
     "C-": 1.70,
     "D+": 1.30,
     "D":  1.00,
-    "E":  0.00
+    "E":  0.00,
+    "NE": 0.00
   },
 
   // Academic Honours Classification
