@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   ATI SLIATE Unofficial Results Portal - Windows Native Data Encryptor (PowerShell / CNG)
 .DESCRIPTION
@@ -144,12 +144,14 @@ if ($rawFiles.Count -eq 0) {
 Write-Host "Found $($rawFiles.Count) raw semester file(s):" -ForegroundColor Green
 $rawFiles | ForEach-Object { Write-Host " - $($_.Name)" }
 
-# Grade point mapping
+# Grade point mapping (SLIATE Standard)
 $gradePoints = @{
     "A+" = 4.00; "A" = 4.00; "A-" = 3.70;
     "B+" = 3.30; "B" = 3.00; "B-" = 2.70;
-    "C+" = 2.30; "C" = 2.00; "C-" = 1.50;
-    "D+" = 1.30; "D" = 1.00; "E" = 0.00
+    "C+" = 2.30; "C" = 2.00; "C-" = 1.70;
+    "D+" = 1.30; "D" = 1.00; "E" = 0.00;
+    "I(SE)" = 0.00; "I(CA)" = 0.00; "DFR" = 0.00;
+    "AB" = 0.00; "INC" = 0.00; "*" = 0.00
 }
 
 $students = @{}
@@ -159,24 +161,26 @@ foreach ($file in $rawFiles) {
     $year = if ($content.year) { $content.year } else { 1 }
     $sem = if ($content.semester) { $content.semester } else { 1 }
     $semTitle = if ($content.semesterTitle) { $content.semesterTitle } else { "Year $year Semester $sem" }
-    $acadYear = if ($content.academicYear) { $content.academicYear } else { "2021/2022" }
+    $acadYear = if ($content.academicYear) { $content.academicYear } else { "2023/2024" }
 
     foreach ($rec in $content.records) {
         $idx = $rec.indexNumber.Trim().ToUpper() -replace '\s+', ''
         if (-not $students.ContainsKey($idx)) {
             $parts = $idx -split '[\/\-]'
-            $campusCode = if ($rec.campusCode) { $rec.campusCode } elseif ($parts.Length -ge 1) { $parts[0] } else { "AMP" }
+            $campusCode = if ($rec.campusCode) { $rec.campusCode } elseif ($parts.Length -ge 1) { $parts[0] } else { "KAN" }
             $progCode = if ($rec.programCode) { $rec.programCode } elseif ($parts.Length -ge 2) { $parts[1] } else { "IT" }
 
             $students[$idx] = [ordered]@{
                 indexNumber = $idx
                 registrationNumber = if ($rec.registrationNumber) { $rec.registrationNumber } else { $rec.regNo }
                 name = if ($rec.name) { $rec.name } else { "Student" }
-                campus = if ($rec.campus) { $rec.campus } else { "Hardy Advanced Technological Institute, Ampara" }
+                campus = if ($rec.campus) { $rec.campus } else { "Advanced Technological Institute, Kandy" }
                 campusCode = $campusCode
                 program = if ($rec.program) { $rec.program } else { "Higher National Diploma in Information Technology" }
                 programCode = $progCode
                 academicYear = $acadYear
+                academicStatus = if ($rec.academicStatus) { $rec.academicStatus } else { "" }
+                hasWithheld = if ($rec.hasWithheld) { [bool]$rec.hasWithheld } else { $false }
                 semesters = [System.Collections.ArrayList]@()
             }
         }
@@ -202,7 +206,12 @@ foreach ($file in $rawFiles) {
             }) | Out-Null
         }
 
-        $sgpa = if ($semCredits -gt 0) { [Math]::Round($semQP / $semCredits, 2) } else { 0.0 }
+        $calcSgpa = if ($semCredits -gt 0) { [Math]::Round($semQP / $semCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
+        $sgpa = if ($rec.officialSgpa -and $rec.officialSgpa -ne "*") {
+            try { [double]$rec.officialSgpa } catch { $calcSgpa }
+        } else {
+            $calcSgpa
+        }
 
         $students[$idx].semesters.Add([ordered]@{
             year = $year
@@ -217,24 +226,32 @@ foreach ($file in $rawFiles) {
 
 Write-Host "`nConsolidated $($students.Count) student records across semesters.`n" -ForegroundColor Yellow
 
+# Clean previous encrypted files
+Get-ChildItem -Path $OUT_DIR -Filter "*.json" | Remove-Item -Force
+
 $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
 
 foreach ($idx in $students.Keys) {
     $student = $students[$idx]
     
-    # Calculate CGPA
+    # Calculate CGPA and Earned Credits
     $totQP = 0.0
     $totCredits = 0.0
+    $totCreditsEarned = 0.0
     foreach ($sem in $student.semesters) {
         foreach ($c in $sem.courses) {
             $totQP += ($c.credits * $c.gradePoint)
             $totCredits += $c.credits
+            if ($c.gradePoint -gt 0) {
+                $totCreditsEarned += $c.credits
+            }
         }
     }
 
-    $cgpa = if ($totCredits -gt 0) { [Math]::Round($totQP / $totCredits, 2) } else { 0.0 }
+    $cgpa = if ($student.hasWithheld) { 0.0 } elseif ($totCredits -gt 0) { [Math]::Round($totQP / $totCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
     $student["cgpa"] = $cgpa
-    $student["totalCreditsEarned"] = $totCredits
+    $student["totalCreditsEarned"] = $totCreditsEarned
+    $student["totalCreditsAttempted"] = $totCredits
 
     # JSON representation
     $jsonString = $student | ConvertTo-Json -Depth 10 -Compress

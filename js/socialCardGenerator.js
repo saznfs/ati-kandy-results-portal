@@ -358,7 +358,11 @@ const PortalSocialCardGenerator = (() => {
       const statPillW = 820;
       drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 46, 23, theme);
 
-      const statText = `Completed Semesters: 4    •    Earned Credits: ${student.totalCreditsEarned || student.totalCredits || 68}    •    Academic Status: Clear Pass`;
+      const semCount = student.semesters && student.semesters.length > 0 ? student.semesters.length : 1;
+      const earnedCredits = (student.totalCreditsEarned !== undefined) ? student.totalCreditsEarned : (student.totalCredits || 20);
+      const standing = student.hasWithheld ? "Withheld" : (student.academicStatus && student.academicStatus.includes("Passed") ? "Clear Pass" : (parseFloat(student.cgpa) >= 2.0 ? "Clear Pass" : "Referred"));
+
+      const statText = `Completed Semesters: ${semCount}    •    Earned Credits: ${earnedCredits}    •    Academic Status: ${standing}`;
       drawFittedText(
         statText,
         width / 2,
@@ -377,10 +381,14 @@ const PortalSocialCardGenerator = (() => {
       const gap = 20;
       const startX = (width - (cardW * 3 + gap * 2)) / 2;
 
+      const semCount = student.semesters && student.semesters.length > 0 ? student.semesters.length : 1;
+      const earnedCredits = (student.totalCreditsEarned !== undefined) ? student.totalCreditsEarned : (student.totalCredits || 20);
+      const standing = student.hasWithheld ? "WITHHELD" : (student.academicStatus && student.academicStatus.includes("Passed") ? "PASS" : (parseFloat(student.cgpa) >= 2.0 ? "PASS" : "REFERRED"));
+
       const metrics = [
-        { val: "4", label: "Completed Semesters" },
-        { val: String(student.totalCreditsEarned || student.totalCredits || 68), label: "Credits Earned" },
-        { val: "PASS", label: "Academic Standing" }
+        { val: String(semCount), label: "Completed Semesters" },
+        { val: String(earnedCredits), label: "Credits Earned" },
+        { val: standing, label: "Academic Standing" }
       ];
 
       metrics.forEach((m, idx) => {
@@ -660,10 +668,14 @@ const PortalSocialCardGenerator = (() => {
     const metricGap = 20;
     const metricStartX = (width - (metricW * 3 + metricGap * 2)) / 2;
 
+    const semCount = student.semesters && student.semesters.length > 0 ? student.semesters.length : 1;
+    const earnedCredits = (student.totalCreditsEarned !== undefined) ? student.totalCreditsEarned : (student.totalCredits || 20);
+    const standing = student.hasWithheld ? "WITHHELD" : (student.academicStatus && student.academicStatus.includes("Passed") ? "PASS" : (parseFloat(student.cgpa) >= 2.0 ? "PASS" : "REFERRED"));
+
     const metrics = [
-      { val: "4", label: "Completed Semesters" },
-      { val: String(student.totalCreditsEarned || student.totalCredits || 68), label: "Credits Earned" },
-      { val: "PASS", label: "Academic Standing" }
+      { val: String(semCount), label: "Completed Semesters" },
+      { val: String(earnedCredits), label: "Credits Earned" },
+      { val: standing, label: "Academic Standing" }
     ];
 
     metrics.forEach((m, idx) => {
