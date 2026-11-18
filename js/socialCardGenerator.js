@@ -1,7 +1,7 @@
 /**
  * ATI SLIATE Unofficial Results Portal - Social Share Card Generator
  * High-resolution HTML5 Canvas rendering for 9:16 Story (1080x1920) and 1:1 Post (1080x1080)
- * with custom aesthetic themes, auto-fitted responsive typography, privacy controls,
+ * with custom aesthetic themes, auto-fitted responsive typography, zero text clipping,
  * and Web Share API integration.
  */
 
@@ -11,7 +11,7 @@ const PortalSocialCardGenerator = (() => {
   let currentStudent = null;
 
   const currentOptions = {
-    aspectRatio: "1:1", // default or "9:16"
+    aspectRatio: "9:16", // "9:16" or "1:1"
     theme: "navy",       // "navy", "emerald", "onyx", "crimson"
     showGrades: true,
     showRegNo: false
@@ -142,8 +142,8 @@ const PortalSocialCardGenerator = (() => {
     ctx.fillRect(0, 0, width, height);
 
     // Subtle background mesh glow circles
-    drawGlowCircle(width * 0.2, height * 0.15, 300, theme.accentGlow);
-    drawGlowCircle(width * 0.8, height * 0.85, 350, "rgba(251, 191, 36, 0.15)");
+    drawGlowCircle(width * 0.2, height * 0.15, 320, theme.accentGlow);
+    drawGlowCircle(width * 0.8, height * 0.85, 380, "rgba(251, 191, 36, 0.15)");
 
     // Outer & Inner Decorative Borders
     ctx.strokeStyle = theme.cardBorder;
@@ -163,17 +163,15 @@ const PortalSocialCardGenerator = (() => {
 
   /**
    * Dedicated 1:1 Square Post Renderer (1080 x 1080)
-   * Perfectly balanced proportions, zero text truncation, zero border overlap
    */
   function render1x1Post(student, theme) {
     const width = 1080;
     const height = 1080;
-    const maxContentWidth = 860; // Safe inner width with 110px margins
+    const maxContentWidth = 860;
 
     // 1. Header Emblem & Titles
     drawEmblemBadge(width / 2, 94, theme, 26);
 
-    // Institute Title (auto-fitted to never overflow)
     drawFittedText(
       "SRI LANKA INSTITUTE OF ADVANCED TECHNOLOGICAL EDUCATION",
       width / 2,
@@ -186,7 +184,6 @@ const PortalSocialCardGenerator = (() => {
       theme.gold
     );
 
-    // Subtitle
     drawFittedText(
       "UNOFFICIAL STUDENT COMMUNITY PORTAL",
       width / 2,
@@ -201,13 +198,12 @@ const PortalSocialCardGenerator = (() => {
 
     // 2. Student Identity Card Box
     const cardMargin = 75;
-    const cardWidth = width - (cardMargin * 2); // 930px
+    const cardWidth = width - (cardMargin * 2);
     const cardY = 190;
     const cardHeight = 155;
 
     drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 20, theme);
 
-    // Student Name
     drawFittedText(
       student.name || "Student Name",
       width / 2,
@@ -220,7 +216,6 @@ const PortalSocialCardGenerator = (() => {
       theme.textPrimary
     );
 
-    // Program
     const progText = student.program || CONFIG.programNames[student.programCode] || "Higher National Diploma";
     drawFittedText(
       progText,
@@ -234,7 +229,6 @@ const PortalSocialCardGenerator = (() => {
       theme.accent
     );
 
-    // Campus
     const campus = student.campus || CONFIG.campusNames[student.campusCode] || "ATI Campus";
     drawFittedText(
       campus,
@@ -248,7 +242,6 @@ const PortalSocialCardGenerator = (() => {
       theme.textSecondary
     );
 
-    // Index & Reg No
     const regPart = currentOptions.showRegNo ? `   •   Reg: ${student.registrationNumber || student.regNo || "-"}` : "";
     drawFittedText(
       `Index No: ${student.indexNumber}${regPart}`,
@@ -282,7 +275,6 @@ const PortalSocialCardGenerator = (() => {
     ctx.stroke();
     ctx.restore();
 
-    // GPA Number
     ctx.textAlign = "center";
     ctx.fillStyle = theme.gold;
     ctx.font = "900 54px 'Courier New', monospace";
@@ -292,7 +284,6 @@ const PortalSocialCardGenerator = (() => {
     ctx.font = "bold 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     ctx.fillText("CUMULATIVE GPA", width / 2, circleCenterY + 30);
 
-    // Honours Banner
     const honours = PortalUI.getHonoursClassification(student.cgpa);
     const bannerW = 480;
     const bannerH = 42;
@@ -329,27 +320,22 @@ const PortalSocialCardGenerator = (() => {
         );
 
         const cardH = 74;
-        const colW = (width - 150 - 24) / 2; // ~440px
+        const colW = (width - 150 - 24) / 2;
         const gridY = 628;
 
         topCourses.forEach((c, idx) => {
           const cx = 75 + idx * (colW + 24);
           drawGlassCard(cx, gridY, colW, cardH, 14, theme);
 
-          // Course Title
           ctx.textAlign = "left";
           ctx.fillStyle = theme.textPrimary;
-          ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-          const title = c.title || c.name || c.code;
-          const truncated = title.length > 24 ? title.substring(0, 23) + "…" : title;
-          ctx.fillText(truncated, cx + 18, gridY + 32);
+          const courseTitle = c.title || c.name || c.code;
+          drawFittedText(courseTitle, cx + 18, gridY + 32, 16, 0, colW - 75, "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold", theme.textPrimary, "left");
 
-          // Code & Credits
           ctx.fillStyle = theme.textSecondary;
           ctx.font = "500 13px 'Courier New', monospace";
           ctx.fillText(`${c.code} • ${c.credits || 3} Credits`, cx + 18, gridY + 54);
 
-          // Grade Badge
           ctx.textAlign = "right";
           ctx.fillStyle = theme.gold;
           ctx.font = "900 24px 'Courier New', monospace";
@@ -357,7 +343,6 @@ const PortalSocialCardGenerator = (() => {
         });
       }
 
-      // Compact Stat Pill
       const statPillY = 724;
       const statPillW = 820;
       drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 46, 23, theme);
@@ -375,7 +360,6 @@ const PortalSocialCardGenerator = (() => {
         theme.textSecondary
       );
     } else {
-      // 3-Metric Stat Cards Grid (when grades are hidden)
       const statGridY = 615;
       const cardW = 275;
       const cardH = 95;
@@ -402,7 +386,6 @@ const PortalSocialCardGenerator = (() => {
         ctx.fillText(m.label, mx + cardW / 2, statGridY + 75);
       });
 
-      // Verification Badge Pill
       const badgeY = 730;
       const badgeW = 600;
       drawGlassCard((width - badgeW) / 2, badgeY, badgeW, 42, 21, theme);
@@ -419,7 +402,7 @@ const PortalSocialCardGenerator = (() => {
       );
     }
 
-    // 5. Mandatory Non-Government Disclaimer Footer (Strictly Inside Borders)
+    // 5. Mandatory Non-Government Disclaimer Footer
     const dividerY = 890;
     ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
     ctx.lineWidth = 1;
@@ -428,7 +411,6 @@ const PortalSocialCardGenerator = (() => {
     ctx.lineTo(width - 120, dividerY);
     ctx.stroke();
 
-    // Disclaimer Line 1
     drawFittedText(
       "Unofficial student portal for viewing and social sharing only.",
       width / 2,
@@ -441,7 +423,6 @@ const PortalSocialCardGenerator = (() => {
       "rgba(255, 255, 255, 0.75)"
     );
 
-    // Disclaimer Line 2
     drawFittedText(
       "Not affiliated with SLIATE or Government of Sri Lanka. For official transcripts, contact ATI.",
       width / 2,
@@ -454,7 +435,6 @@ const PortalSocialCardGenerator = (() => {
       "rgba(255, 255, 255, 0.6)"
     );
 
-    // Generation Tag
     drawFittedText(
       "Generated via ATI SLIATE Community Portal",
       width / 2,
@@ -470,58 +450,53 @@ const PortalSocialCardGenerator = (() => {
 
   /**
    * Dedicated 9:16 Story Renderer (1080 x 1920)
-   * High-res mobile story layout with distinction modules and generous padding
+   * Perfectly fills the vertical space, balanced layout, zero clipping, rich academic details
    */
   function render9x16Story(student, theme) {
     const width = 1080;
     const height = 1920;
     const maxContentWidth = 860;
 
-    let currentY = 120;
+    // 1. Header Emblem & Titles
+    drawEmblemBadge(width / 2, 115, theme, 34);
 
-    // Header Emblem
-    drawEmblemBadge(width / 2, currentY, theme, 32);
-    currentY += 80;
-
-    // Institute Title
     drawFittedText(
       "SRI LANKA INSTITUTE OF ADVANCED TECHNOLOGICAL EDUCATION",
       width / 2,
-      currentY,
-      20,
-      2,
+      175,
+      18,
+      1.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       "bold",
       theme.gold
     );
-    currentY += 34;
 
-    // Subtitle
     drawFittedText(
       "UNOFFICIAL STUDENT COMMUNITY PORTAL",
       width / 2,
-      currentY,
-      16,
-      2,
-      maxContentWidth - 100,
+      205,
+      13.5,
+      1.5,
+      maxContentWidth - 80,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       "600",
       theme.textSecondary
     );
-    currentY += 65;
 
-    // Student Identity Card
+    // 2. Student Identity Card Box
     const cardMargin = 75;
-    const cardWidth = width - (cardMargin * 2);
-    const cardHeight = 190;
-    drawGlassCard(cardMargin, currentY, cardWidth, cardHeight, 24, theme);
+    const cardWidth = width - (cardMargin * 2); // 930px
+    const cardY = 240;
+    const cardHeight = 185;
+    drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 22, theme);
 
+    // Student Name
     drawFittedText(
       student.name || "Student Name",
       width / 2,
-      currentY + 54,
-      42,
+      cardY + 50,
+      40,
       -0.5,
       cardWidth - 50,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -529,12 +504,13 @@ const PortalSocialCardGenerator = (() => {
       theme.textPrimary
     );
 
+    // Program Title
     const progText = student.program || CONFIG.programNames[student.programCode] || "Higher National Diploma";
     drawFittedText(
       progText,
       width / 2,
-      currentY + 98,
-      24,
+      cardY + 90,
+      23,
       0,
       cardWidth - 60,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -542,12 +518,13 @@ const PortalSocialCardGenerator = (() => {
       theme.accent
     );
 
+    // Campus
     const campus = student.campus || CONFIG.campusNames[student.campusCode] || "ATI Campus";
     drawFittedText(
       campus,
       width / 2,
-      currentY + 136,
-      19,
+      cardY + 126,
+      18,
       0.5,
       cardWidth - 60,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -555,12 +532,13 @@ const PortalSocialCardGenerator = (() => {
       theme.textSecondary
     );
 
+    // Index & Reg No
     const regPart = currentOptions.showRegNo ? `   •   Reg: ${student.registrationNumber || student.regNo || "-"}` : "";
     drawFittedText(
       `Index No: ${student.indexNumber}${regPart}`,
       width / 2,
-      currentY + 166,
-      17,
+      cardY + 158,
+      16,
       0.5,
       cardWidth - 60,
       "'Courier New', monospace",
@@ -568,11 +546,9 @@ const PortalSocialCardGenerator = (() => {
       theme.textSecondary
     );
 
-    currentY += cardHeight + 65;
-
-    // Hero GPA Circle
-    const circleRadius = 115;
-    const circleCenterY = currentY + circleRadius;
+    // 3. Hero GPA Circle & Honours Banner
+    const circleCenterY = 540;
+    const circleRadius = 90;
 
     ctx.save();
     ctx.beginPath();
@@ -584,7 +560,7 @@ const PortalSocialCardGenerator = (() => {
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.arc(width / 2, circleCenterY, circleRadius - 12, 0, Math.PI * 2);
+    ctx.arc(width / 2, circleCenterY, circleRadius - 10, 0, Math.PI * 2);
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = theme.cardBorder;
     ctx.stroke();
@@ -592,105 +568,167 @@ const PortalSocialCardGenerator = (() => {
 
     ctx.textAlign = "center";
     ctx.fillStyle = theme.gold;
-    ctx.font = "900 82px 'Courier New', monospace";
-    ctx.fillText(Number(student.cgpa).toFixed(2), width / 2, circleCenterY + 12);
+    ctx.font = "900 68px 'Courier New', monospace";
+    ctx.fillText(Number(student.cgpa).toFixed(2), width / 2, circleCenterY + 10);
 
     ctx.fillStyle = theme.textSecondary;
-    ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-    ctx.fillText("CUMULATIVE GPA", width / 2, circleCenterY + 46);
-
-    currentY = circleCenterY + circleRadius + 40;
+    ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.fillText("CUMULATIVE GPA", width / 2, circleCenterY + 40);
 
     // Honours Banner
     const honours = PortalUI.getHonoursClassification(student.cgpa);
-    const bannerW = 540;
-    const bannerH = 54;
-    drawGlassCard((width - bannerW) / 2, currentY, bannerW, bannerH, 27, theme, true);
+    const bannerW = 520;
+    const bannerH = 48;
+    const bannerY = 660;
+    drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 24, theme, true);
 
     drawFittedText(
       `★  ${honours.title.toUpperCase()}  ★`,
       width / 2,
-      currentY + 36,
-      22,
+      bannerY + 32,
+      20,
       2,
-      bannerW - 40,
+      bannerW - 30,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       "900",
       theme.gold
     );
 
-    currentY += bannerH + 55;
-
-    // Distinction Subjects Grid
+    // 4. Distinction Highlights Grid (2x2)
+    let nextY = 745;
     if (currentOptions.showGrades) {
       const topCourses = extractTopCourses(student, 4);
 
       if (topCourses.length > 0) {
         drawFittedText(
-          "DISTINCTION MODULE HIGHLIGHTS",
+          "⭐ DISTINCTION MODULE HIGHLIGHTS",
           width / 2,
-          currentY,
-          18,
-          3,
+          nextY,
+          16,
+          2.5,
           maxContentWidth,
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           "bold",
           theme.textSecondary
         );
-        currentY += 28;
+        nextY += 25;
 
-        const gridY = currentY;
-        const colW = (width - 150 - 24) / 2;
-        const cardH = 88;
+        const colW = (width - 150 - 24) / 2; // 440px
+        const cardH = 82;
 
         topCourses.forEach((c, idx) => {
           const col = idx % 2;
           const row = Math.floor(idx / 2);
           const cx = 75 + col * (colW + 24);
-          const cy = gridY + row * (cardH + 16);
+          const cy = nextY + row * (cardH + 16);
 
           drawGlassCard(cx, cy, colW, cardH, 16, theme);
 
           ctx.textAlign = "left";
-          ctx.fillStyle = theme.textPrimary;
-          ctx.font = "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
           const title = c.title || c.name || c.code;
-          const truncated = title.length > 22 ? title.substring(0, 21) + "…" : title;
-          ctx.fillText(truncated, cx + 18, cy + 36);
+          drawFittedText(title, cx + 18, cy + 34, 16.5, 0, colW - 75, "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", "bold", theme.textPrimary, "left");
 
           ctx.fillStyle = theme.textSecondary;
-          ctx.font = "500 15px 'Courier New', monospace";
-          ctx.fillText(`${c.code} • ${c.credits || 3} Credits`, cx + 18, cy + 62);
+          ctx.font = "500 13px 'Courier New', monospace";
+          ctx.fillText(`${c.code} • ${c.credits || 3} Credits`, cx + 18, cy + 58);
 
           ctx.textAlign = "right";
           ctx.fillStyle = theme.gold;
-          ctx.font = "900 28px 'Courier New', monospace";
-          ctx.fillText(c.grade, cx + colW - 18, cy + 52);
+          ctx.font = "900 26px 'Courier New', monospace";
+          ctx.fillText(c.grade, cx + colW - 18, cy + 48);
         });
 
-        currentY += Math.ceil(topCourses.length / 2) * (cardH + 16) + 30;
+        nextY += Math.ceil(topCourses.length / 2) * (cardH + 16) + 30;
       }
     }
 
-    // Stats Pill
-    const statsPillW = 860;
-    const statsPillH = 56;
-    drawGlassCard((width - statsPillW) / 2, currentY, statsPillW, statsPillH, 28, theme);
-    const statsSummary = `Completed Semesters: 4    •    Earned Credits: ${student.totalCreditsEarned || student.totalCredits || 68}    •    Status: Clear Pass`;
+    // 5. 3-Milestone Statistics Grid (Fills the previous void elegantly!)
+    const statGridY = nextY;
+    const metricW = 285;
+    const metricH = 110;
+    const metricGap = 20;
+    const metricStartX = (width - (metricW * 3 + metricGap * 2)) / 2;
+
+    const metrics = [
+      { val: "4", label: "Completed Semesters" },
+      { val: String(student.totalCreditsEarned || student.totalCredits || 68), label: "Credits Earned" },
+      { val: "PASS", label: "Academic Standing" }
+    ];
+
+    metrics.forEach((m, idx) => {
+      const mx = metricStartX + idx * (metricW + metricGap);
+      drawGlassCard(mx, statGridY, metricW, metricH, 18, theme);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = theme.gold;
+      ctx.font = "900 38px 'Courier New', monospace";
+      ctx.fillText(m.val, mx + metricW / 2, statGridY + 50);
+
+      ctx.fillStyle = theme.textSecondary;
+      ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText(m.label, mx + metricW / 2, statGridY + 82);
+    });
+
+    nextY = statGridY + metricH + 30;
+
+    // 6. Semester GPA Progression Card (Shows progression across semesters)
+    const semBoxW = 900;
+    const semBoxH = 105;
+    const semBoxX = (width - semBoxW) / 2;
+    drawGlassCard(semBoxX, nextY, semBoxW, semBoxH, 20, theme);
+
     drawFittedText(
-      statsSummary,
+      "SEMESTER GPA PROGRESSION",
       width / 2,
-      currentY + 36,
-      17,
-      1,
-      statsPillW - 40,
+      nextY + 30,
+      13.5,
+      2,
+      semBoxW - 40,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      "700",
+      "bold",
       theme.textSecondary
     );
 
-    // Footer (Inside borders)
-    const footerDividerY = height - 150;
+    const sems = student.semesters || [];
+    const count = Math.max(sems.length, 4);
+    const semItemW = (semBoxW - 40) / count;
+
+    for (let i = 0; i < 4; i++) {
+      const s = sems[i];
+      const semLabel = s ? `Y${s.year}S${s.semester}` : `Sem ${i + 1}`;
+      const semGpa = s ? Number(s.sgpa).toFixed(2) : "-";
+      const sx = semBoxX + 20 + i * semItemW;
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = theme.gold;
+      ctx.font = "900 22px 'Courier New', monospace";
+      ctx.fillText(semGpa, sx + semItemW / 2, nextY + 65);
+
+      ctx.fillStyle = theme.textSecondary;
+      ctx.font = "600 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText(semLabel, sx + semItemW / 2, nextY + 86);
+    }
+
+    nextY += semBoxH + 30;
+
+    // 7. Verified Badge Pill
+    const badgeW = 680;
+    const badgeH = 46;
+    drawGlassCard((width - badgeW) / 2, nextY, badgeW, badgeH, 23, theme);
+    drawFittedText(
+      "🎓 Verified Student Academic Record • ATI SLIATE",
+      width / 2,
+      nextY + 30,
+      15.5,
+      1,
+      badgeW - 40,
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "bold",
+      theme.accent
+    );
+
+    // 8. Mandatory Non-Government Disclaimer Footer (Inside borders with breathing room)
+    const footerDividerY = 1680;
     ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -701,8 +739,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       "Unofficial student portal for viewing and social sharing only.",
       width / 2,
-      footerDividerY + 30,
-      16,
+      footerDividerY + 32,
+      14,
       0,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -711,10 +749,10 @@ const PortalSocialCardGenerator = (() => {
     );
 
     drawFittedText(
-      "Not affiliated with SLIATE or Government of Sri Lanka. For official transcripts, contact ATI.",
+      "Not affiliated with SLIATE or Government of Sri Lanka.",
       width / 2,
-      footerDividerY + 56,
-      14.5,
+      footerDividerY + 58,
+      13,
       0,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -723,11 +761,23 @@ const PortalSocialCardGenerator = (() => {
     );
 
     drawFittedText(
+      "For official certified transcripts, contact your ATI administration.",
+      width / 2,
+      footerDividerY + 80,
+      12.5,
+      0,
+      maxContentWidth,
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      "normal",
+      "rgba(255, 255, 255, 0.5)"
+    );
+
+    drawFittedText(
       "Generated via ATI SLIATE Community Portal",
       width / 2,
-      footerDividerY + 86,
-      15,
-      1,
+      footerDividerY + 110,
+      13.5,
+      0.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       "bold",
