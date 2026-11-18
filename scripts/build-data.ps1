@@ -194,16 +194,22 @@ foreach ($file in $rawFiles) {
         foreach ($c in $courses) {
             $cr = [double]$c.credits
             $gp = if ($null -ne $c.gradePoint) { [double]$c.gradePoint } elseif ($gradePoints.ContainsKey($c.grade)) { $gradePoints[$c.grade] } else { 0.0 }
-            $semQP += ($cr * $gp)
-            $semCredits += $cr
+            if (-not $c.isNgpa) {
+                $semQP += ($cr * $gp)
+                $semCredits += $cr
+            }
 
-            $coursesList.Add([ordered]@{
+            $courseObj = [ordered]@{
                 code = $c.code
                 title = $c.title
                 credits = $cr
                 grade = $c.grade
                 gradePoint = $gp
-            }) | Out-Null
+            }
+            if ($c.isNgpa) {
+                $courseObj["isNgpa"] = $true
+            }
+            $coursesList.Add($courseObj) | Out-Null
         }
 
         $calcSgpa = if ($semCredits -gt 0) { [Math]::Round($semQP / $semCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
@@ -234,24 +240,42 @@ $rng = [System.Security.Cryptography.RandomNumberGenerator]::Create()
 foreach ($idx in $students.Keys) {
     $student = $students[$idx]
     
-    # Calculate CGPA and Earned Credits
+    # Sort semesters sequentially
+    $sortedSems = $student.semesters | Sort-Object { $_.year * 10 + $_.semester }
+    $student.semesters = [System.Collections.ArrayList]@($sortedSems)
+
+    # Calculate CGPA and Earned Credits across all semesters
     $totQP = 0.0
-    $totCredits = 0.0
+    $totGpaCredits = 0.0
     $totCreditsEarned = 0.0
+    $hasAnyPending = $false
+    $hasAnyWithheld = $false
+
     foreach ($sem in $student.semesters) {
         foreach ($c in $sem.courses) {
-            $totQP += ($c.credits * $c.gradePoint)
-            $totCredits += $c.credits
+            if (-not $c.isNgpa) {
+                $totQP += ($c.credits * $c.gradePoint)
+                $totGpaCredits += $c.credits
+            }
             if ($c.gradePoint -gt 0) {
                 $totCreditsEarned += $c.credits
+            }
+            if ($c.grade -in @("I(SE)", "I(CA)", "AB", "E", "INC", "DFR")) {
+                $hasAnyPending = $true
+            }
+            if ($c.grade -eq "*") {
+                $hasAnyWithheld = $true
             }
         }
     }
 
-    $cgpa = if ($student.hasWithheld) { 0.0 } elseif ($totCredits -gt 0) { [Math]::Round($totQP / $totCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
+    $cgpa = if ($hasAnyWithheld) { 0.0 } elseif ($totGpaCredits -gt 0) { [Math]::Round($totQP / $totGpaCredits, 2, [System.MidpointRounding]::AwayFromZero) } else { 0.0 }
     $student["cgpa"] = $cgpa
     $student["totalCreditsEarned"] = $totCreditsEarned
-    $student["totalCreditsAttempted"] = $totCredits
+    $student["totalCreditsAttempted"] = $totGpaCredits
+    $student["hasPending"] = $hasAnyPending
+    $student["hasWithheld"] = $hasAnyWithheld
+    $student["academicStatus"] = if ($hasAnyWithheld) { "Result Withheld" } elseif (-not $hasAnyPending) { "All Modules Passed" } else { "Incomplete / Repeat" }
 
     # JSON representation
     $jsonString = $student | ConvertTo-Json -Depth 10 -Compress

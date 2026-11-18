@@ -164,13 +164,15 @@ function buildData() {
             gp = CONFIG.gradePoints[c.grade] !== undefined ? CONFIG.gradePoints[c.grade] : 0.0;
           }
           c.gradePoint = gp;
-          totalSemQualityPoints += credits * gp;
-          totalSemCredits += credits;
+          if (!c.isNgpa && credits > 0) {
+            totalSemQualityPoints += credits * gp;
+            totalSemCredits += credits;
+          }
         });
 
-        const sgpa = totalSemCredits > 0
-          ? Number((totalSemQualityPoints / totalSemCredits).toFixed(2))
-          : 0.0;
+        const sgpa = (rec.officialSgpa && rec.officialSgpa !== "*")
+          ? Number(rec.officialSgpa)
+          : (totalSemCredits > 0 ? Math.round((totalSemQualityPoints / totalSemCredits) * 100) / 100 : 0.0);
 
         student.semesters.push({
           year,
@@ -198,21 +200,39 @@ function buildData() {
 
     // Calculate overall CGPA
     let cumulativeQualityPoints = 0;
-    let cumulativeCredits = 0;
+    let cumulativeGpaCredits = 0;
+    let totalEarnedCredits = 0;
+    let hasAnyPending = false;
+    let hasAnyWithheld = false;
 
     student.semesters.forEach(s => {
       s.courses.forEach(c => {
         const cr = Number(c.credits) || 0;
         const gp = Number(c.gradePoint) || 0;
-        cumulativeQualityPoints += cr * gp;
-        cumulativeCredits += cr;
+        if (!c.isNgpa && cr > 0) {
+          cumulativeQualityPoints += cr * gp;
+          cumulativeGpaCredits += cr;
+        }
+        if (gp > 0) {
+          totalEarnedCredits += cr;
+        }
+        if (["I(SE)", "I(CA)", "AB", "E", "INC", "DFR"].includes(c.grade)) {
+          hasAnyPending = true;
+        }
+        if (c.grade === "*") {
+          hasAnyWithheld = true;
+        }
       });
     });
 
-    student.totalCreditsEarned = cumulativeCredits;
-    student.cgpa = cumulativeCredits > 0
-      ? Number((cumulativeQualityPoints / cumulativeCredits).toFixed(2))
-      : 0.0;
+    student.totalCreditsEarned = totalEarnedCredits;
+    student.totalCreditsAttempted = cumulativeGpaCredits;
+    student.hasPending = hasAnyPending;
+    student.hasWithheld = hasAnyWithheld;
+    student.academicStatus = hasAnyWithheld ? "Result Withheld" : (!hasAnyPending ? "All Modules Passed" : "Incomplete / Repeat");
+    student.cgpa = hasAnyWithheld ? 0.0 : (cumulativeGpaCredits > 0
+      ? Math.round((cumulativeQualityPoints / cumulativeGpaCredits) * 100) / 100
+      : 0.0);
 
     // Encrypt record
     const encryptedBlob = encryptStudentRecord(student, normIndex);
