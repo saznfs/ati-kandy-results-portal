@@ -142,18 +142,14 @@ const PortalUI = (() => {
         )
       ),
 
-      // CGPA & Standing Row
+      // GPA & Standing Row
       el("div", { class: "performance-hero-row" },
         el("div", { class: "cgpa-stat-card" },
           el("div", { class: "cgpa-number" }, Number(student.cgpa).toFixed(2)),
           el("div", { class: "cgpa-details" },
-            el("span", { class: "cgpa-label" }, "Cumulative GPA (CGPA)"),
+            el("span", { class: "cgpa-label" }, "GPA"),
             el("span", { class: `standing-badge ${honours.badgeClass}` }, honours.title)
           )
-        ),
-        el("div", { class: "credits-stat-card" },
-          el("div", { class: "credits-number" }, `${student.totalCreditsEarned || student.totalCredits || 60}`),
-          el("span", { class: "credits-label" }, "Total GPA Credits Earned")
         )
       )
     );
@@ -283,8 +279,7 @@ const PortalUI = (() => {
     const header = el("div", { class: "semester-summary-header" },
       el("h3", { class: "semester-title" }, sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`),
       el("div", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-        el("span", { class: "semester-sgpa-pill" }, `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`),
-        el("span", { class: "meta-label" }, `Credits: ${sem.semesterCredits || sem.credits || "-"}`)
+        el("span", { class: "semester-sgpa-pill" }, `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`)
       )
     );
 
@@ -292,7 +287,6 @@ const PortalUI = (() => {
     const tableBody = el("tbody");
     courses.forEach(course => {
       const gradeClass = getGradeClass(course.grade);
-      const isPassed = !["E", "F", "I", "AB"].includes((course.grade || "").toUpperCase());
 
       const row = el("tr", {},
         el("td", { class: "col-code", "data-label": "Code" },
@@ -301,21 +295,11 @@ const PortalUI = (() => {
         el("td", { class: "col-title", "data-label": "Subject Name" },
           el("span", { class: "course-name" }, course.title || course.name || "-")
         ),
-        el("td", { "data-label": "Credits" }, String(course.credits || "-")),
         el("td", { "data-label": "Grade" },
           el("span", { class: `grade-pill ${gradeClass}` }, course.grade || "-")
         ),
         el("td", { "data-label": "Grade Point" },
           course.gradePoint !== undefined ? Number(course.gradePoint).toFixed(2) : "-"
-        ),
-        el("td", { "data-label": "Status" },
-          el("span", {
-            style: {
-              fontWeight: "600",
-              color: isPassed ? "var(--color-emerald-600)" : "var(--color-rose-600)",
-              fontSize: "0.8125rem"
-            }
-          }, isPassed ? "Pass" : "Repeat")
         )
       );
       tableBody.appendChild(row);
@@ -327,10 +311,8 @@ const PortalUI = (() => {
           el("tr", {},
             el("th", {}, "Course Code"),
             el("th", {}, "Course Title"),
-            el("th", {}, "Credits"),
             el("th", {}, "Grade"),
-            el("th", {}, "Grade Point"),
-            el("th", {}, "Status")
+            el("th", {}, "Grade Point")
           )
         ),
         tableBody
@@ -347,16 +329,14 @@ const PortalUI = (() => {
     const originalText = btn.textContent;
     const honours = getHonoursClassification(student.cgpa);
     const summary = [
-      `🎓 ATI SLIATE Academic Results Summary`,
+      `🎓 SLIATE KANDY Academic Results`,
       `Student: ${student.name}`,
       `Index No: ${student.indexNumber}`,
       `Program: ${student.program || "HND"}`,
       `Campus: ${student.campus || "ATI"}`,
-      `Cumulative GPA: ${Number(student.cgpa).toFixed(2)}`,
-      `Academic Standing: ${honours.title}`,
-      `Total Credits: ${student.totalCreditsEarned || student.totalCredits || 60}`,
-      `\nView results at: ${window.location.origin}${window.location.pathname}?index=${encodeURIComponent(student.indexNumber)}`,
-      `\n*Disclaimer: Unofficial student community record for viewing only.`
+      `GPA: ${Number(student.cgpa).toFixed(2)}`,
+      `Honours: ${honours.title}`,
+      `\nView results at: ${window.location.origin}${window.location.pathname}?index=${encodeURIComponent(student.indexNumber)}`
     ].join("\n");
 
     try {

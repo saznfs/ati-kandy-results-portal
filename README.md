@@ -1,4 +1,4 @@
-# 🎓 ATI SLIATE Unofficial Results Portal & Social Share Generator
+# 🎓 SLIATE KANDY Results Portal & Social Card Generator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Hosting: GitHub Pages](https://img.shields.io/badge/Hosting-GitHub%20Pages-success.svg)](https://pages.github.com/)

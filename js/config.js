@@ -5,19 +5,19 @@
 
 const CONFIG = {
   // Brand & Identity
-  siteTitle: "ATI SLIATE Unofficial Results Portal",
-  shortTitle: "ATI Results",
-  tagline: "Student Community Results Portal & Social Share Generator",
+  siteTitle: "SLIATE KANDY Results Portal",
+  shortTitle: "SLIATE KANDY",
+  tagline: "Results Portal & Social Card Generator",
   version: "1.0.0",
 
   // Academic Emblem & Logo (Graceful fallback)
   logoPath: "assets/images/sliate-logo.png",
   logoFallback: "assets/images/logo-placeholder.svg",
 
-  // STRICT Non-Government Disclaimer
-  disclaimer: "Unofficial portal for viewing and social sharing only. Not affiliated with SLIATE or the Government of Sri Lanka. For official transcripts, contact your ATI administration.",
-  pdfDisclaimer: "UNOFFICIAL RESULT STATEMENT - FOR COMMUNITY VIEWING ONLY. Not an official transcript. Not valid for legal, immigration, or government recruitment verification.",
-  socialDisclaimer: "Unofficial Student Portal • Not an official SLIATE transcript",
+  // Portal text
+  disclaimer: "SLIATE KANDY Results Portal.",
+  pdfDisclaimer: "SLIATE KANDY - Examination Result Statement",
+  socialDisclaimer: "SLIATE KANDY",
 
   // Report Issue / Removal Request
   reportIssueEmail: "sliate.community.portal@gmail.com",

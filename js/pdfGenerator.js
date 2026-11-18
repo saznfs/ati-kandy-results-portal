@@ -39,35 +39,22 @@ const PortalPdfGenerator = (() => {
     // Diagonal Background Watermark
     doc.saveGraphicsState();
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(36);
+    doc.setFontSize(38);
     doc.setTextColor(230, 235, 245);
-    doc.setGState(new doc.GState({ opacity: 0.15 }));
-    // Rotate and print watermark across page
-    doc.text("UNOFFICIAL STUDENT RECORD", pageWidth / 2, pageHeight / 2 - 20, {
-      align: "center",
-      angle: 45
-    });
-    doc.text("NOT FOR OFFICIAL USE", pageWidth / 2, pageHeight / 2 + 20, {
+    doc.setGState(new doc.GState({ opacity: 0.12 }));
+    doc.text("SLIATE KANDY", pageWidth / 2, pageHeight / 2, {
       align: "center",
       angle: 45
     });
     doc.restoreGraphicsState();
 
-    // Top Unofficial Warning Banner
-    doc.setFillColor(254, 243, 199); // #fef3c7
-    doc.rect(10, 10, pageWidth - 20, 7, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7.5);
-    doc.setTextColor(146, 64, 14); // #92400e
-    doc.text("COMMUNITY PORTAL • UNOFFICIAL STATEMENT OF RESULTS (NON-GOVERNMENT)", pageWidth / 2, 14.5, { align: "center" });
-
-    y = 22;
+    y = 18;
 
     // Academic Logo Emblem
     const logoImg = document.getElementById("siteLogo");
     if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
       try {
-        doc.addImage(logoImg, "PNG", margin + 2, 18.5, 15, 15);
+        doc.addImage(logoImg, "PNG", margin + 2, 14, 15, 15);
       } catch (e) {
         // Fallback gracefully
       }
@@ -75,20 +62,14 @@ const PortalPdfGenerator = (() => {
 
     // Title & Institute Name
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setTextColor(15, 43, 92);
-    doc.text("SRI LANKA INSTITUTE OF ADVANCED TECHNOLOGICAL EDUCATION", pageWidth / 2, y, { align: "center" });
+    doc.text("SLIATE KANDY", pageWidth / 2, y, { align: "center" });
 
-    y += 5.5;
+    y += 6;
     doc.setFontSize(10.5);
     doc.setTextColor(37, 99, 235);
-    doc.text("ACADEMIC PERFORMANCE TRANSCRIPT RECORD", pageWidth / 2, y, { align: "center" });
-
-    y += 4.5;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("Generated via ATI SLIATE Community Results Portal", pageWidth / 2, y, { align: "center" });
+    doc.text("EXAMINATION RESULTS RECORD", pageWidth / 2, y, { align: "center" });
 
     // Decorative divider line
     y += 4;
@@ -188,7 +169,7 @@ const PortalPdfGenerator = (() => {
       const semTitle = sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`;
       doc.text(semTitle.toUpperCase(), margin + 3, y + 4.2);
 
-      const semStats = `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}  |  Credits: ${sem.semesterCredits || 15}`;
+      const semStats = `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`;
       doc.text(semStats, pageWidth - margin - 3, y + 4.2, { align: "right" });
 
       y += 6.5;
@@ -197,16 +178,14 @@ const PortalPdfGenerator = (() => {
       const tableData = (sem.courses || []).map(c => [
         c.code || "-",
         c.title || c.name || "-",
-        String(c.credits || "-"),
         c.grade || "-",
-        c.gradePoint !== undefined ? Number(c.gradePoint).toFixed(2) : "-",
-        !["E", "F", "I", "AB"].includes((c.grade || "").toUpperCase()) ? "Pass" : "Repeat"
+        c.gradePoint !== undefined ? Number(c.gradePoint).toFixed(2) : "-"
       ]);
 
       doc.autoTable({
         startY: y,
         margin: { left: margin, right: margin },
-        head: [["Course Code", "Course Title", "Credits", "Grade", "Points", "Status"]],
+        head: [["Course Code", "Course Title", "Grade", "Points"]],
         body: tableData,
         theme: "plain",
         styles: {
@@ -224,19 +203,17 @@ const PortalPdfGenerator = (() => {
           fillColor: [248, 250, 252]
         },
         columnStyles: {
-          0: { cellWidth: 26, font: "courier", fontStyle: "bold" },
+          0: { cellWidth: 28, font: "courier", fontStyle: "bold" },
           1: { cellWidth: "auto" },
-          2: { cellWidth: 16, halign: "center" },
-          3: { cellWidth: 16, halign: "center", fontStyle: "bold" },
-          4: { cellWidth: 16, halign: "center" },
-          5: { cellWidth: 18, halign: "center" }
+          2: { cellWidth: 22, halign: "center", fontStyle: "bold" },
+          3: { cellWidth: 22, halign: "center" }
         }
       });
 
       y = doc.lastAutoTable.finalY + 4;
     });
 
-    // --- 4. Overall Academic Standing & CGPA Box ---
+    // --- 4. Overall Academic Standing & GPA Box ---
     const honours = PortalUI.getHonoursClassification(student.cgpa);
 
     doc.setFillColor(241, 245, 249);
@@ -247,7 +224,7 @@ const PortalPdfGenerator = (() => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("CUMULATIVE GPA (CGPA)", margin + 6, y + 5.5);
+    doc.text("GPA", margin + 6, y + 5.5);
     doc.setFont("courier", "bold");
     doc.setFontSize(14);
     doc.setTextColor(37, 99, 235);
@@ -256,40 +233,25 @@ const PortalPdfGenerator = (() => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("ACADEMIC STANDING", margin + 70, y + 5.5);
+    doc.text("ACADEMIC HONOURS", margin + 70, y + 5.5);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
     doc.setTextColor(217, 119, 6);
     doc.text(honours.title.toUpperCase(), margin + 70, y + 11.5);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("TOTAL CREDITS", pageWidth - margin - 35, y + 5.5);
-    doc.setFont("courier", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(15, 23, 42);
-    doc.text(`${student.totalCreditsEarned || student.totalCredits || 60} Earned`, pageWidth - margin - 35, y + 11.5);
-
     y += 20;
 
-    // --- 5. Mandatory Non-Government Disclaimer & Footer ---
+    // --- 5. Clean Footer ---
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.3);
-    doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
-
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(6.8);
-    doc.setTextColor(100, 116, 139);
-    const disclaimerLines = doc.splitTextToSize(CONFIG.disclaimer, pageWidth - (margin * 2));
-    doc.text(disclaimerLines, pageWidth / 2, pageHeight - 16, { align: "center" });
+    doc.line(margin, pageHeight - 16, pageWidth - margin, pageHeight - 16);
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(6.5);
+    doc.setFontSize(7);
     doc.setTextColor(148, 163, 184);
     const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-    doc.text(`Generated on: ${dateStr} • Digital Document Reference: ${student.indexNumber.replace(/\//g, "-")}`, margin, pageHeight - 10.5);
-    doc.text("Page 1 of 1", pageWidth - margin, pageHeight - 10.5, { align: "right" });
+    doc.text(`SLIATE KANDY • Generated: ${dateStr} • Ref: ${student.indexNumber.replace(/\//g, "-")}`, margin, pageHeight - 10);
+    doc.text("Page 1 of 1", pageWidth - margin, pageHeight - 10, { align: "right" });
 
     // Save PDF
     const filename = `ATI_Result_${student.indexNumber.replace(/[\/\\]/g, "_")}.pdf`;
