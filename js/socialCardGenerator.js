@@ -9,6 +9,16 @@ const PortalSocialCardGenerator = (() => {
   let canvas = null;
   let ctx = null;
   let currentStudent = null;
+  let logoImg = null;
+
+  function getLogoImage() {
+    if (!logoImg) {
+      logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      logoImg.src = CONFIG.logoPath;
+    }
+    return logoImg;
+  }
 
   const currentOptions = {
     aspectRatio: "9:16", // "9:16" or "1:1"
@@ -73,6 +83,7 @@ const PortalSocialCardGenerator = (() => {
     if (canvas) {
       ctx = canvas.getContext("2d");
     }
+    getLogoImage();
   }
 
   /**
@@ -826,39 +837,50 @@ const PortalSocialCardGenerator = (() => {
   }
 
   /**
-   * Helper: Draw top academic emblem badge
+   * Helper: Draw top academic emblem badge with official SLIATE logo
    */
   function drawEmblemBadge(cx, cy, theme, radius = 30) {
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = theme.cardBg;
+    ctx.fillStyle = "#ffffff"; // Clean white background
     ctx.fill();
     ctx.lineWidth = 2.5;
     ctx.strokeStyle = theme.gold;
     ctx.stroke();
 
-    const scale = radius / 30;
+    const img = getLogoImage();
+    if (img && img.complete && img.naturalWidth > 0) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
+      ctx.clip();
+      const drawSize = radius * 1.7;
+      ctx.drawImage(img, cx - drawSize / 2, cy - drawSize / 2, drawSize, drawSize);
+      ctx.restore();
+    } else {
+      const scale = radius / 30;
 
-    // Cap icon inside badge
-    ctx.fillStyle = theme.gold;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - 13 * scale);
-    ctx.lineTo(cx + 18 * scale, cy - 3 * scale);
-    ctx.lineTo(cx, cy + 7 * scale);
-    ctx.lineTo(cx - 18 * scale, cy - 3 * scale);
-    ctx.closePath();
-    ctx.fill();
+      // Fallback Cap icon inside badge
+      ctx.fillStyle = theme.gold;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - 13 * scale);
+      ctx.lineTo(cx + 18 * scale, cy - 3 * scale);
+      ctx.lineTo(cx, cy + 7 * scale);
+      ctx.lineTo(cx - 18 * scale, cy - 3 * scale);
+      ctx.closePath();
+      ctx.fill();
 
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.moveTo(cx - 11 * scale, cy);
-    ctx.lineTo(cx - 11 * scale, cy + 8 * scale);
-    ctx.quadraticCurveTo(cx, cy + 14 * scale, cx + 11 * scale, cy + 8 * scale);
-    ctx.lineTo(cx + 11 * scale, cy);
-    ctx.lineTo(cx, cy + 5 * scale);
-    ctx.closePath();
-    ctx.fill();
+      ctx.fillStyle = "#2c1c73";
+      ctx.beginPath();
+      ctx.moveTo(cx - 11 * scale, cy);
+      ctx.lineTo(cx - 11 * scale, cy + 8 * scale);
+      ctx.quadraticCurveTo(cx, cy + 14 * scale, cx + 11 * scale, cy + 8 * scale);
+      ctx.lineTo(cx + 11 * scale, cy);
+      ctx.lineTo(cx, cy + 5 * scale);
+      ctx.closePath();
+      ctx.fill();
+    }
     ctx.restore();
   }
 

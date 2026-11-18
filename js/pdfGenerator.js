@@ -63,6 +63,16 @@ const PortalPdfGenerator = (() => {
 
     y = 22;
 
+    // Academic Logo Emblem
+    const logoImg = document.getElementById("siteLogo");
+    if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
+      try {
+        doc.addImage(logoImg, "PNG", margin + 2, 18.5, 15, 15);
+      } catch (e) {
+        // Fallback gracefully
+      }
+    }
+
     // Title & Institute Name
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
