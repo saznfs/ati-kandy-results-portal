@@ -223,25 +223,37 @@ const PortalPdfGenerator = (() => {
       doc.setFontSize(9.5);
       doc.setTextColor(255, 255, 255);
       const semTitle = sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`;
-      doc.text(semTitle.toUpperCase(), margin + 4, y + 4.8);
+      const hasRepeatsInSem = (sem.courses || []).some(c => c.repeatCleared || c.attempt === 2 || c.isRepeat);
+      const semHeaderTitle = hasRepeatsInSem ? `${semTitle} (POST-REPEAT / 2ND ATTEMPT)` : semTitle.toUpperCase();
+      doc.text(semHeaderTitle, margin + 4, y + 4.8);
 
       const semStats = `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`;
       doc.text(semStats, pageWidth - margin - 4, y + 4.8, { align: "right" });
 
       y += 7.5;
 
-      // Table rows
-      const tableData = (sem.courses || []).map(c => [
-        c.code || "-",
-        c.title || c.name || "-",
-        c.grade || "-",
-        c.gradePoint !== undefined ? Number(c.gradePoint).toFixed(2) : "-"
-      ]);
+      // Table rows with explicit Attempt indicators
+      const tableData = (sem.courses || []).map(c => {
+        let attemptText = "1st Attempt";
+        if (c.repeatCleared || c.attempt === 2 || c.isRepeat) {
+          attemptText = "2nd Attempt";
+        } else if (["I(SE)", "I(CA)", "E", "DFR", "AB", "INC"].includes(c.grade)) {
+          attemptText = "Repeat Req.";
+        }
+
+        return [
+          c.code || "-",
+          c.title || c.name || "-",
+          c.grade || "-",
+          c.gradePoint !== undefined ? Number(c.gradePoint).toFixed(2) : "-",
+          attemptText
+        ];
+      });
 
       doc.autoTable({
         startY: y,
         margin: { left: margin, right: margin, bottom: 20 },
-        head: [["Course Code", "Course Title", "Grade", "Points"]],
+        head: [["Course Code", "Course Title", "Grade", "Points", "Attempt"]],
         body: tableData,
         theme: "plain",
         styles: {
@@ -259,10 +271,24 @@ const PortalPdfGenerator = (() => {
           fillColor: [248, 250, 252]
         },
         columnStyles: {
-          0: { cellWidth: 30, font: "courier", fontStyle: "bold", fontSize: 8.5 },
+          0: { cellWidth: 28, font: "courier", fontStyle: "bold", fontSize: 8.5 },
           1: { cellWidth: "auto", fontSize: 8.5 },
-          2: { cellWidth: 22, halign: "center", fontStyle: "bold", fontSize: 9 },
-          3: { cellWidth: 22, halign: "center", fontSize: 8.5 }
+          2: { cellWidth: 18, halign: "center", fontStyle: "bold", fontSize: 9 },
+          3: { cellWidth: 18, halign: "center", fontSize: 8.5 },
+          4: { cellWidth: 26, halign: "center", fontStyle: "bold", fontSize: 8 }
+        },
+        didParseCell: function (data) {
+          if (data.section === "body" && data.column.index === 4) {
+            if (data.cell.raw === "2nd Attempt") {
+              data.cell.styles.textColor = [180, 83, 9]; // Amber #b45309
+              data.cell.styles.fontStyle = "bold";
+            } else if (data.cell.raw === "Repeat Req.") {
+              data.cell.styles.textColor = [220, 38, 38]; // Red #dc2626
+              data.cell.styles.fontStyle = "bold";
+            } else {
+              data.cell.styles.textColor = [100, 116, 139]; // Muted slate #64748b
+            }
+          }
         }
       });
 

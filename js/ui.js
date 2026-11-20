@@ -276,15 +276,51 @@ const PortalUI = (() => {
   }
 
   /**
+   * Helper to determine attempt badge status (1st Attempt vs 2nd Attempt / Repeat)
+   */
+  function getAttemptInfo(course) {
+    if (course.repeatCleared || course.attempt === 2 || course.isRepeat) {
+      return {
+        text: "2nd Attempt",
+        badgeClass: "badge-attempt-2nd",
+        isRepeat: true
+      };
+    }
+    if (["I(SE)", "I(CA)", "E", "DFR", "AB", "INC"].includes(course.grade)) {
+      return {
+        text: "Repeat Pending",
+        badgeClass: "badge-attempt-pending",
+        isRepeat: false
+      };
+    }
+    return {
+      text: "1st Attempt",
+      badgeClass: "badge-attempt-1st",
+      isRepeat: false
+    };
+  }
+
+  /**
    * Renders a single semester block (header + table of subjects)
    */
   function renderSingleSemesterBlock(sem) {
     const courses = sem.courses || sem.subjects || [];
+    const hasRepeats = courses.some(c => c.repeatCleared || c.attempt === 2 || c.isRepeat);
+
+    const headerActions = [
+      el("span", { class: "semester-sgpa-pill" }, `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`)
+    ];
+
+    if (hasRepeats) {
+      headerActions.unshift(
+        el("span", { class: "semester-repeat-tag" }, "🔁 Includes 2nd Attempt")
+      );
+    }
 
     const header = el("div", { class: "semester-summary-header" },
       el("h3", { class: "semester-title" }, sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`),
-      el("div", { style: { display: "flex", gap: "8px", alignItems: "center" } },
-        el("span", { class: "semester-sgpa-pill" }, `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`)
+      el("div", { style: { display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" } },
+        ...headerActions
       )
     );
 
@@ -292,6 +328,7 @@ const PortalUI = (() => {
     const tableBody = el("tbody");
     courses.forEach(course => {
       const gradeClass = getGradeClass(course.grade);
+      const attempt = getAttemptInfo(course);
 
       const row = el("tr", {},
         el("td", { class: "col-code", "data-label": "Code" },
@@ -305,6 +342,9 @@ const PortalUI = (() => {
         ),
         el("td", { "data-label": "Grade Point" },
           course.gradePoint !== undefined ? Number(course.gradePoint).toFixed(2) : "-"
+        ),
+        el("td", { "data-label": "Attempt" },
+          el("span", { class: `attempt-badge ${attempt.badgeClass}` }, attempt.text)
         )
       );
       tableBody.appendChild(row);
@@ -317,7 +357,8 @@ const PortalUI = (() => {
             el("th", {}, "Course Code"),
             el("th", {}, "Course Title"),
             el("th", {}, "Grade"),
-            el("th", {}, "Grade Point")
+            el("th", {}, "Grade Point"),
+            el("th", {}, "Attempt")
           )
         ),
         tableBody
