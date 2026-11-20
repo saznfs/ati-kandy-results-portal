@@ -122,37 +122,37 @@ const PortalPdfGenerator = (() => {
     doc.setTextColor(15, 23, 42);
     doc.text(String(student.indexNumber || "N/A"), col1X + 38, infoY);
 
-    // Registration No
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("REGISTRATION NO:", col2X, infoY);
-    doc.setFont("courier", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(15, 23, 42);
-    doc.text(String(student.registrationNumber || student.regNo || "N/A"), col2X + 32, infoY);
-
-    infoY += 6.5;
     // Campus
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("ATI CAMPUS:", col1X, infoY);
+    doc.text("ATI CAMPUS:", col2X, infoY);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(15, 23, 42);
     const campusText = student.campus || CONFIG.campusNames[student.campusCode] || "ATI";
-    doc.text(campusText, col1X + 38, infoY);
+    doc.text(campusText, col2X + 26, infoY);
 
+    infoY += 6.5;
     // Academic Year
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("ACADEMIC YEAR:", col2X, infoY);
+    doc.text("ACADEMIC YEAR:", col1X, infoY);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(15, 23, 42);
-    doc.text(String(student.academicYear || "2021/2022"), col2X + 32, infoY);
+    doc.text(String(student.academicYear || "2023/2024"), col1X + 38, infoY);
+
+    // Total Semesters
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text("TOTAL SEMESTERS:", col2X, infoY);
+    doc.setFont("courier", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text(String(student.semesters ? student.semesters.length : 4), col2X + 34, infoY);
 
     y = infoBoxTop + infoBoxHeight + 5;
 

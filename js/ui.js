@@ -129,12 +129,8 @@ const PortalUI = (() => {
           el("span", { class: "meta-value" }, student.indexNumber || "-")
         ),
         el("div", { class: "meta-item" },
-          el("span", { class: "meta-label" }, "Registration No"),
-          el("span", { class: "meta-value" }, student.registrationNumber || student.regNo || "-")
-        ),
-        el("div", { class: "meta-item" },
           el("span", { class: "meta-label" }, "Academic Year"),
-          el("span", { class: "meta-value" }, student.academicYear || "2021/2022")
+          el("span", { class: "meta-value" }, student.academicYear || "2023/2024")
         ),
         el("div", { class: "meta-item" },
           el("span", { class: "meta-label" }, "Total Semesters"),

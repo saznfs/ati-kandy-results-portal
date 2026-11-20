@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const aspectBtns = document.querySelectorAll("[data-aspect]");
   const themeBtns = document.querySelectorAll("[data-theme-choice]");
   const toggleGrades = document.getElementById("toggleShowGrades");
-  const toggleRegNo = document.getElementById("toggleShowRegNo");
 
   // 1. Initialize UI components
   PortalUI.init();
@@ -258,12 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (toggleGrades) {
     toggleGrades.addEventListener("change", () => {
       PortalSocialCardGenerator.render(currentStudentData, { showGrades: toggleGrades.checked });
-    });
-  }
-
-  if (toggleRegNo) {
-    toggleRegNo.addEventListener("change", () => {
-      PortalSocialCardGenerator.render(currentStudentData, { showRegNo: toggleRegNo.checked });
     });
   }
 

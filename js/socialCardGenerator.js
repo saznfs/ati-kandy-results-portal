@@ -23,8 +23,7 @@ const PortalSocialCardGenerator = (() => {
   const currentOptions = {
     aspectRatio: "9:16", // "9:16" or "1:1"
     theme: "navy",       // "navy", "emerald", "onyx", "crimson"
-    showGrades: true,
-    showRegNo: false
+    showGrades: true
   };
 
   const THEMES = {
@@ -241,9 +240,8 @@ const PortalSocialCardGenerator = (() => {
       theme.textSecondary
     );
 
-    const regPart = currentOptions.showRegNo ? `   •   Reg: ${student.registrationNumber || student.regNo || "-"}` : "";
     drawFittedText(
-      `Index No: ${student.indexNumber}${regPart}`,
+      `Index No: ${student.indexNumber}`,
       width / 2,
       cardY + 135,
       15,
@@ -477,9 +475,8 @@ const PortalSocialCardGenerator = (() => {
     );
 
     // Index & Reg No
-    const regPart = currentOptions.showRegNo ? `   •   Reg: ${student.registrationNumber || student.regNo || "-"}` : "";
     drawFittedText(
-      `Index No: ${student.indexNumber}${regPart}`,
+      `Index No: ${student.indexNumber}`,
       width / 2,
       cardY + 158,
       16,
