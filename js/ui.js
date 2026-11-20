@@ -106,8 +106,12 @@ const PortalUI = (() => {
     const honours = getHonoursClassification(student.cgpa);
     const initials = getInitials(student.name);
 
-    const campusDisplay = CONFIG.campusNames[student.campusCode] || student.campus || "ATI Campus";
-    const programDisplay = CONFIG.programNames[student.programCode] || student.program || "Higher National Diploma";
+    const campusDisplay = (student.campusCode === "KAN" || (student.campus && student.campus.includes("Kandy")))
+      ? "SLIATE Kandy"
+      : (CONFIG.campusNames[student.campusCode] || student.campus || "SLIATE Kandy");
+    const programDisplay = (student.programCode === "IT" || (student.program && student.program.includes("Information Technology")))
+      ? "HNDIT"
+      : (CONFIG.programNames[student.programCode] || student.program || "HNDIT");
 
     return el("div", { class: "student-card" },
       // Header: Avatar, Name, Program
@@ -138,15 +142,20 @@ const PortalUI = (() => {
         )
       ),
 
-      // GPA & Standing Row
-      el("div", { class: "performance-hero-row" },
-        el("div", { class: "cgpa-stat-card" },
-          el("div", { class: "cgpa-number" }, Number(student.cgpa).toFixed(2)),
-          el("div", { class: "cgpa-details" },
-            el("span", { class: "cgpa-label" }, "GPA"),
-            el("span", { class: `standing-badge ${honours.badgeClass}` }, honours.title)
+      // All Semester GPAs Showcase Grid Row
+      el("div", { class: "semester-gpa-summary-grid" },
+        ...(student.semesters || []).map(sem =>
+          el("div", { class: "semester-gpa-stat-card" },
+            el("span", { class: "meta-label", style: { fontSize: "0.75rem", display: "block", marginBottom: "4px" } }, `Year ${sem.year} Sem ${sem.semester}`),
+            el("span", { style: { fontSize: "1.35rem", fontWeight: "900", color: "var(--brand-accent)", fontFamily: "var(--font-mono)", display: "block" } }, Number(sem.sgpa || 0).toFixed(2)),
+            el("span", { style: { fontSize: "0.7rem", color: "var(--color-text-muted)", display: "block", marginTop: "2px" } }, "Semester GPA")
           )
         )
+      ),
+
+      // Standing Badge Row
+      el("div", { style: { display: "flex", justifyContent: "center", marginTop: "14px" } },
+        el("span", { class: `standing-badge ${honours.badgeClass}` }, honours.title)
       )
     );
   }
@@ -333,13 +342,14 @@ const PortalUI = (() => {
       shareUrl = `${window.location.origin}${window.location.pathname}?index=${encodeURIComponent(student.indexNumber)}`;
     }
 
+    const semGpas = (student.semesters || []).map(s => `Y${s.year}S${s.semester}: ${Number(s.sgpa || 0).toFixed(2)}`).join(" | ");
     const summary = [
       `🎓 SLIATE KANDY Academic Results`,
       `Student: ${student.name}`,
       `Index No: ${student.indexNumber}`,
-      `Program: ${student.program || "HND"}`,
-      `Campus: ${student.campus || "ATI"}`,
-      `GPA: ${Number(student.cgpa).toFixed(2)}`,
+      `Program: HNDIT`,
+      `Campus: SLIATE Kandy`,
+      `Semester GPAs: ${semGpas}`,
       `Honours: ${honours.title}`,
       `\nView results at: ${shareUrl}`
     ].join("\n");

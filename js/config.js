@@ -61,29 +61,29 @@ const CONFIG = {
 
   // Known ATI Campuses
   campusNames: {
-    "AMP": "Hardy Advanced Technological Institute, Ampara",
-    "COL": "Advanced Technological Institute, Colombo",
-    "KAN": "Advanced Technological Institute, Kandy",
-    "GAL": "Advanced Technological Institute, Galle (Labuduwa)",
-    "KUR": "Advanced Technological Institute, Kurunegala",
-    "JAF": "Advanced Technological Institute, Jaffna",
-    "BAD": "Advanced Technological Institute, Badulla",
-    "TRI": "Advanced Technological Institute, Trincomalee",
-    "KEG": "Advanced Technological Institute, Kegalle",
-    "DEH": "Advanced Technological Institute, Dehiwala",
-    "MAT": "Advanced Technological Institute, Mattakkuliya"
+    "AMP": "SLIATE Ampara",
+    "COL": "SLIATE Colombo",
+    "KAN": "SLIATE Kandy",
+    "GAL": "SLIATE Galle",
+    "KUR": "SLIATE Kurunegala",
+    "JAF": "SLIATE Jaffna",
+    "BAD": "SLIATE Badulla",
+    "TRI": "SLIATE Trincomalee",
+    "KEG": "SLIATE Kegalle",
+    "DEH": "SLIATE Dehiwala",
+    "MAT": "SLIATE Mattakkuliya"
   },
 
-  // Known SLIATE HND Programs
+  // Known SLIATE HND Programs (Short Form)
   programNames: {
-    "IT": "Higher National Diploma in Information Technology (HNDIT)",
-    "AC": "Higher National Diploma in Accountancy (HNDA)",
-    "MA": "Higher National Diploma in Management (HNDM)",
-    "ENG": "Higher National Diploma in Engineering (HNDE)",
-    "THM": "Higher National Diploma in Tourism & Hospitality Management (HNDTHM)",
-    "FT": "Higher National Diploma in Food Technology (HNDFT)",
-    "QS": "Higher National Diploma in Quantity Surveying (HNDQS)",
-    "BA": "Higher National Diploma in Business Administration (HNDBA)"
+    "IT": "HNDIT",
+    "AC": "HNDA",
+    "MA": "HNDM",
+    "ENG": "HNDE",
+    "THM": "HNDTHM",
+    "FT": "HNDFT",
+    "QS": "HNDQS",
+    "BA": "HNDBA"
   }
 };
 

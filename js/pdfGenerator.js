@@ -108,7 +108,9 @@ const PortalPdfGenerator = (() => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(37, 99, 235);
-    const progText = student.program || CONFIG.programNames[student.programCode] || "HNDIT";
+    const progText = (student.programCode === "IT" || (student.program && student.program.includes("Information Technology")))
+      ? "HNDIT"
+      : (CONFIG.programNames[student.programCode] || student.program || "HNDIT");
     doc.text(doc.splitTextToSize(progText, 70), col2X + 22, infoY);
 
     infoY += 6.5;
@@ -126,11 +128,13 @@ const PortalPdfGenerator = (() => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("ATI CAMPUS:", col2X, infoY);
+    doc.text("CAMPUS:", col2X, infoY);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(15, 23, 42);
-    const campusText = student.campus || CONFIG.campusNames[student.campusCode] || "ATI";
+    const campusText = (student.campusCode === "KAN" || (student.campus && student.campus.includes("Kandy")))
+      ? "SLIATE Kandy"
+      : (CONFIG.campusNames[student.campusCode] || student.campus || "SLIATE Kandy");
     doc.text(campusText, col2X + 26, infoY);
 
     infoY += 6.5;
@@ -213,8 +217,10 @@ const PortalPdfGenerator = (() => {
       y = doc.lastAutoTable.finalY + 4;
     });
 
-    // --- 4. Overall Academic Standing & GPA Box ---
+    // --- 4. Overall Academic Standing & Semester GPAs Box ---
     const honours = PortalUI.getHonoursClassification(student.cgpa);
+    const sems = student.semesters || [];
+    const semGpaSummary = sems.map(s => `Y${s.year}S${s.semester}: ${Number(s.sgpa || 0).toFixed(2)}`).join("   |   ");
 
     doc.setFillColor(241, 245, 249);
     doc.setDrawColor(37, 99, 235);
@@ -224,20 +230,20 @@ const PortalPdfGenerator = (() => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("GPA", margin + 6, y + 5.5);
+    doc.text("SEMESTER GPAS", margin + 6, y + 5.5);
     doc.setFont("courier", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(9.5);
     doc.setTextColor(37, 99, 235);
-    doc.text(Number(student.cgpa).toFixed(2) + " / 4.00", margin + 6, y + 12);
+    doc.text(semGpaSummary, margin + 6, y + 11.5);
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text("ACADEMIC HONOURS", margin + 70, y + 5.5);
+    doc.text("ACADEMIC HONOURS", margin + 115, y + 5.5);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
     doc.setTextColor(217, 119, 6);
-    doc.text(honours.title.toUpperCase(), margin + 70, y + 11.5);
+    doc.text(honours.title.toUpperCase(), margin + 115, y + 11.5);
 
     y += 20;
 

@@ -457,6 +457,28 @@
   color: var(--text-main);
 }
 
+/* All Semester GPAs Grid */
+.semester-gpa-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.semester-gpa-stat-card {
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.semester-gpa-stat-card:hover {
+  border-color: var(--brand-accent);
+  transform: translateY(-2px);
+}
+
 /* CGPA & Standing Hero Badges */
 .performance-hero-row {
   display: flex;

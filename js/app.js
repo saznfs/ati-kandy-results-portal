@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnShareCard = document.getElementById("btnShareCard");
   const aspectBtns = document.querySelectorAll("[data-aspect]");
   const themeBtns = document.querySelectorAll("[data-theme-choice]");
-  const toggleGrades = document.getElementById("toggleShowGrades");
 
   // 1. Initialize UI components
   PortalUI.init();
@@ -240,12 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Privacy Switches
-  if (toggleGrades) {
-    toggleGrades.addEventListener("change", () => {
-      PortalSocialCardGenerator.render(currentStudentData, { showGrades: toggleGrades.checked });
-    });
-  }
+
 
   // Download & Share buttons
   if (btnDownloadPng) {
