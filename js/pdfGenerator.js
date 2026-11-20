@@ -1,10 +1,41 @@
 /**
  * ATI SLIATE Unofficial Results Portal - PDF Certificate Generator
  * Generates an A4 Vector PDF Statement of Results with clean academic styling,
- * explicit unofficial watermarks, student profile details, and multi-semester tables.
+ * multi-page support, balanced per-year pagination, zero orphan headers,
+ * and high-contrast typography.
  */
 
 const PortalPdfGenerator = (() => {
+
+  /**
+   * Draws decorative academic borders and background watermark on the given page
+   */
+  function drawPageBackground(doc) {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // 1. Outer decorative navy border
+    doc.setDrawColor(15, 43, 92); // Academic Navy #0f2b5c
+    doc.setLineWidth(0.8);
+    doc.rect(8, 8, pageWidth - 16, pageHeight - 16);
+
+    // 2. Inner decorative gold border
+    doc.setDrawColor(217, 119, 6); // Gold #d97706
+    doc.setLineWidth(0.3);
+    doc.rect(9.5, 9.5, pageWidth - 19, pageHeight - 19);
+
+    // 3. Diagonal background watermark
+    doc.saveGraphicsState();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(36);
+    doc.setTextColor(230, 235, 245);
+    doc.setGState(new doc.GState({ opacity: 0.10 }));
+    doc.text("SLIATE KANDY", pageWidth / 2, pageHeight / 2, {
+      align: "center",
+      angle: 45
+    });
+    doc.restoreGraphicsState();
+  }
 
   /**
    * Generates and downloads the A4 PDF Certificate for a student
@@ -27,26 +58,8 @@ const PortalPdfGenerator = (() => {
     const margin = 14;
     let y = margin;
 
-    // --- 1. Academic Header & Border ---
-    // Outer decorative border
-    doc.setDrawColor(15, 43, 92); // Academic Navy #0f2b5c
-    doc.setLineWidth(0.8);
-    doc.rect(8, 8, pageWidth - 16, pageHeight - 16);
-    doc.setDrawColor(217, 119, 6); // Gold #d97706
-    doc.setLineWidth(0.3);
-    doc.rect(9.5, 9.5, pageWidth - 19, pageHeight - 19);
-
-    // Diagonal Background Watermark
-    doc.saveGraphicsState();
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(38);
-    doc.setTextColor(230, 235, 245);
-    doc.setGState(new doc.GState({ opacity: 0.12 }));
-    doc.text("SLIATE KANDY", pageWidth / 2, pageHeight / 2, {
-      align: "center",
-      angle: 45
-    });
-    doc.restoreGraphicsState();
+    // --- Page 1 Background & Header ---
+    drawPageBackground(doc);
 
     y = 18;
 
@@ -56,7 +69,7 @@ const PortalPdfGenerator = (() => {
       try {
         doc.addImage(logoImg, "PNG", margin + 2, 14, 15, 15);
       } catch (e) {
-        // Fallback gracefully
+        // Fallback gracefully if CORS prevents direct canvas read
       }
     }
 
@@ -160,11 +173,50 @@ const PortalPdfGenerator = (() => {
 
     y = infoBoxTop + infoBoxHeight + 5;
 
-    // --- 3. Multi-Semester Results Tables ---
+    // --- 3. Multi-Semester Results Tables (Balanced Pagination) ---
     const semesters = student.semesters || [];
 
     semesters.forEach((sem, sIdx) => {
-      // Semester Header
+      // Check if we need to advance to Page 2:
+      // A) Transition to Year 2 when there are 3+ semesters total (clean Year 1 vs Year 2 split)
+      // B) Or insufficient vertical space on current page to hold banner + courses without orphaning
+      const isYearBreak = (sIdx > 0 && sem.year > semesters[sIdx - 1].year && semesters.length >= 3);
+      const coursesCount = (sem.courses || []).length;
+      const estimatedSemesterHeight = 8 + 7 + (coursesCount * 6.2) + 6;
+      const spaceRemaining = pageHeight - 24 - y;
+      const shouldBreakPage = isYearBreak || (estimatedSemesterHeight > spaceRemaining);
+
+      if (shouldBreakPage && y > 70) {
+        doc.addPage();
+        drawPageBackground(doc);
+        y = 20;
+
+        // Continuation Academic Header
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(15, 43, 92);
+        doc.text("SLIATE KANDY", margin, y);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8.5);
+        doc.setTextColor(37, 99, 235);
+        doc.text("STATEMENT OF RESULTS (CONTINUED)", margin + 35, y);
+
+        y += 3.5;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        const continuationMeta = `Student: ${student.name}   |   Index: ${student.indexNumber}   |   Program: HNDIT`;
+        doc.text(continuationMeta, margin, y + 2);
+
+        y += 5;
+        doc.setDrawColor(217, 119, 6);
+        doc.setLineWidth(0.4);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 6;
+      }
+
+      // Semester Header Bar
       doc.setFillColor(15, 43, 92);
       doc.roundedRect(margin, y, pageWidth - (margin * 2), 7, 1, 1, "F");
       doc.setFont("helvetica", "bold");
@@ -188,7 +240,7 @@ const PortalPdfGenerator = (() => {
 
       doc.autoTable({
         startY: y,
-        margin: { left: margin, right: margin },
+        margin: { left: margin, right: margin, bottom: 20 },
         head: [["Course Code", "Course Title", "Grade", "Points"]],
         body: tableData,
         theme: "plain",
@@ -218,46 +270,102 @@ const PortalPdfGenerator = (() => {
     });
 
     // --- 4. Overall Academic Standing & Semester GPAs Box ---
+    // Ensure sufficient room for summary box (requires ~34mm)
+    if ((pageHeight - 22 - y) < 34) {
+      doc.addPage();
+      drawPageBackground(doc);
+      y = 22;
+    }
+
+    const boxWidth = pageWidth - (margin * 2);
+    const boxHeight = 31;
     const honours = PortalUI.getHonoursClassification(student.cgpa);
     const sems = student.semesters || [];
-    const semGpaSummary = sems.map(s => `Y${s.year}S${s.semester}: ${Number(s.sgpa || 0).toFixed(2)}`).join("   |   ");
 
-    doc.setFillColor(241, 245, 249);
+    // Summary Card Container
+    doc.setFillColor(248, 250, 252);
     doc.setDrawColor(37, 99, 235);
     doc.setLineWidth(0.4);
-    doc.roundedRect(margin, y, pageWidth - (margin * 2), 18, 2, 2, "FD");
+    doc.roundedRect(margin, y, boxWidth, boxHeight, 2, 2, "FD");
 
+    // Title: Semester Grade Point Averages
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
+    doc.setFontSize(7.5);
     doc.setTextColor(71, 85, 105);
-    doc.text("SEMESTER GPAS", margin + 6, y + 6);
-    doc.setFont("courier", "bold");
-    doc.setFontSize(10.5);
-    doc.setTextColor(37, 99, 235);
-    doc.text(semGpaSummary, margin + 6, y + 13);
+    doc.text("SEMESTER GRADE POINT AVERAGES (SGPA)", margin + 6, y + 5);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(71, 85, 105);
-    doc.text("ACADEMIC HONOURS", margin + 115, y + 6);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11.5);
-    doc.setTextColor(217, 119, 6);
-    doc.text(honours.title.toUpperCase(), margin + 115, y + 13);
+    // Individual Semester Stat Cards (Pills)
+    const numSems = Math.max(sems.length, 1);
+    const cardGap = 3;
+    const totalGaps = cardGap * (numSems - 1);
+    const cardWidth = (boxWidth - 12 - totalGaps) / numSems;
 
-    y += 22;
+    sems.forEach((s, idx) => {
+      const cardX = margin + 6 + (idx * (cardWidth + cardGap));
+      const cardY = y + 7.5;
+      const cardH = 12;
 
-    // --- 5. Clean Footer ---
+      // Card Background
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.25);
+      doc.roundedRect(cardX, cardY, cardWidth, cardH, 1.5, 1.5, "FD");
+
+      // Card Label
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`YEAR ${s.year} SEM ${s.semester}`, cardX + (cardWidth / 2), cardY + 4.2, { align: "center" });
+
+      // SGPA Value
+      doc.setFont("courier", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(37, 99, 235);
+      doc.text(Number(s.sgpa || 0).toFixed(2), cardX + (cardWidth / 2), cardY + 9.8, { align: "center" });
+    });
+
+    // Divider Line inside Summary Box
+    const honoursY = y + 21.5;
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.3);
-    doc.line(margin, pageHeight - 16, pageWidth - margin, pageHeight - 16);
+    doc.line(margin + 6, honoursY, margin + boxWidth - 6, honoursY);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7.5);
-    doc.setTextColor(148, 163, 184);
+    // Honours Classification Row (Distinct, high-contrast, zero overlap)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text("ACADEMIC HONOURS:", margin + 8, honoursY + 6.2);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(217, 119, 6); // Academic Gold
+    doc.text(`★  ${honours.title.toUpperCase()}  ★`, margin + 54, honoursY + 6.2);
+
+    y += boxHeight + 4;
+
+    // --- 5. Clean Multi-Page Footers (Dynamic "Page X of Y") ---
+    const totalPages = doc.internal.getNumberOfPages();
     const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-    doc.text(`SLIATE KANDY • Generated: ${dateStr} • Ref: ${student.indexNumber.replace(/\//g, "-")}`, margin, pageHeight - 10);
-    doc.text("Page 1 of 1", pageWidth - margin, pageHeight - 10, { align: "right" });
+    const cleanRef = student.indexNumber.replace(/[\/\\]/g, "-");
+
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+
+      // Footer divider line
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.3);
+      doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+
+      // Footer Metadata (Left)
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`SLIATE KANDY • Generated: ${dateStr} • Ref: ${cleanRef}`, margin, pageHeight - 9);
+
+      // Accurate Page Count (Right)
+      doc.setFont("helvetica", "bold");
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 9, { align: "right" });
+    }
 
     // Save PDF
     const filename = `SLIATE_KANDY_${student.indexNumber.replace(/[\/\\]/g, "_")}.pdf`;
