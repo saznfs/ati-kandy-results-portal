@@ -257,6 +257,19 @@
   color: var(--text-muted);
 }
 
+.chip-sample-static {
+  padding: 4px 12px;
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  color: var(--brand-accent);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
 .chip-sample {
   padding: 3px 10px;
   background-color: var(--bg-card-subtle);

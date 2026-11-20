@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const themeToggleBtn = document.getElementById("themeToggleBtn");
   const logoImg = document.getElementById("siteLogo");
   const reportLink = document.getElementById("reportIssueLink");
-  const sampleChips = document.querySelectorAll(".chip-sample");
 
   // Social Modal Elements
   const socialModal = document.getElementById("socialModal");
@@ -87,19 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 6. Sample Index Chips
-  sampleChips.forEach(chip => {
-    chip.addEventListener("click", () => {
-      const sample = chip.dataset.sample;
-      if (sample && indexInput) {
-        indexInput.value = sample;
-        if (searchClearBtn) searchClearBtn.style.display = "block";
-        performSearch(sample);
-      }
-    });
-  });
-
-  // 7. Search Form Submission
+  // 6. Search Form Submission
   if (searchForm) {
     searchForm.addEventListener("submit", (e) => {
       e.preventDefault();
