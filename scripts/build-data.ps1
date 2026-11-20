@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   ATI SLIATE Unofficial Results Portal - Windows Native Data Encryptor (PowerShell / CNG)
 .DESCRIPTION
