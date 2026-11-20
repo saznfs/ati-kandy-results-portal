@@ -771,10 +771,30 @@ const PortalSocialCardGenerator = (() => {
       : "result";
     const aspectPart = currentOptions.aspectRatio === "9:16" ? "Story" : "Post";
     const fileName = `SLIATE_KANDY_${namePart}_${aspectPart}.png`;
-    const shareTitle = "SLIATE KANDY Examination Result";
-    const shareText = currentStudent
-      ? `SLIATE Kandy Examination Results - ${currentStudent.name} (HNDIT)`
-      : "SLIATE KANDY Examination Results";
+    
+    let shareTitle = "SLIATE KANDY Examination Results";
+    let shareText = "SLIATE KANDY Examination Results";
+
+    if (currentStudent) {
+      const studentName = currentStudent.name || "Student";
+      const indexNo = currentStudent.indexNumber || "";
+      const honours = (typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
+        ? PortalUI.getHonoursClassification(currentStudent.cgpa)
+        : null;
+      const honoursLine = (honours && honours.title && honours.minCgpa >= 2.0)
+        ? `\n🏆 Academic Standing: ${honours.title}${currentStudent.cgpa ? ` (CGPA: ${Number(currentStudent.cgpa).toFixed(2)})` : ""}`
+        : "";
+
+      shareTitle = `SLIATE Kandy Examination Results - ${studentName}`;
+      shareText = [
+        `🎓 I am proud to share that I have successfully completed my HNDIT examination results at SLIATE Kandy!`,
+        ``,
+        `👤 Student Name: ${studentName}`,
+        `📋 Index Number: ${indexNo}`,
+        `📚 Program: Higher National Diploma in Information Technology (HNDIT)`,
+        `🏛️ Campus: SLIATE Kandy${honoursLine}`
+      ].join("\n");
+    }
 
     // Build absolute URL for the student's result
     let shareUrl = window.location.href;
@@ -836,7 +856,7 @@ const PortalSocialCardGenerator = (() => {
           await navigator.share({
             files: [file],
             title: shareTitle,
-            text: `${shareText}\n${shareUrl}`
+            text: `${shareText}\n\n🔗 View results:\n${shareUrl}`
           });
           return;
         } catch (retryErr) {
@@ -864,7 +884,7 @@ const PortalSocialCardGenerator = (() => {
     downloadCard();
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        await navigator.clipboard.writeText(`${shareText}\n\n🔗 View results:\n${shareUrl}`);
         if (typeof PortalUI !== "undefined" && PortalUI.showError) {
           PortalUI.showError("Card image downloaded and result link copied to clipboard! You can paste and share it directly.", true);
         }

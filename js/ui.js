@@ -460,15 +460,19 @@ const PortalUI = (() => {
     }
 
     const semGpas = (student.semesters || []).map(s => `Y${s.year}S${s.semester}: ${Number(s.sgpa || 0).toFixed(2)}`).join(" | ");
+    const honoursLine = (honours && honours.title && honours.minCgpa >= 2.0)
+      ? `\n🏆 Academic Standing: ${honours.title}${student.cgpa && Number(student.cgpa) > 0 ? ` (CGPA: ${Number(student.cgpa).toFixed(2)})` : ""}`
+      : "";
+
     const summary = [
-      `🎓 SLIATE KANDY Academic Results`,
-      `Student: ${student.name}`,
-      `Index No: ${student.indexNumber}`,
-      `Program: HNDIT`,
-      `Campus: SLIATE Kandy`,
-      `Semester GPAs: ${semGpas}`,
-      `Honours: ${honours.title}`,
-      `\nView results at: ${shareUrl}`
+      `🎓 I am proud to share that I have successfully completed my HNDIT examination results at SLIATE Kandy!`,
+      ``,
+      `👤 Student Name: ${student.name}`,
+      `📋 Index Number: ${student.indexNumber}`,
+      `📚 Program: Higher National Diploma in Information Technology (HNDIT)`,
+      `🏛️ Campus: SLIATE Kandy`,
+      `📊 Semester GPAs: ${semGpas}${honoursLine}`,
+      `\n🔗 View official results record:\n${shareUrl}`
     ].join("\n");
 
     try {
