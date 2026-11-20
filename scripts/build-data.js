@@ -180,7 +180,8 @@ function buildData() {
           semesterTitle: semTitle,
           sgpa,
           semesterCredits: totalSemCredits,
-          courses
+          courses,
+          repeatUpgraded: !!rec.repeatUpgraded
         });
       });
     } catch (err) {

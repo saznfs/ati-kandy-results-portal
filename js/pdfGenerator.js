@@ -251,7 +251,7 @@ const PortalPdfGenerator = (() => {
       doc.setFontSize(9.5);
       doc.setTextColor(255, 255, 255);
       const semTitle = sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`;
-      const hasRepeatsInSem = (sem.courses || []).some(c => c.repeatCleared || c.attempt === 2 || c.isRepeat);
+      const hasRepeatsInSem = (sem.courses || []).some(c => c.repeatCleared || Number(c.attempt) === 2 || c.attempt === 2 || c.isRepeat);
       const semHeaderTitle = hasRepeatsInSem ? `${semTitle} (POST-REPEAT / 2ND ATTEMPT)` : semTitle.toUpperCase();
       doc.text(semHeaderTitle, margin + 4, y + 4.8);
 
@@ -263,7 +263,7 @@ const PortalPdfGenerator = (() => {
       // Table rows with explicit Attempt indicators
       const tableData = (sem.courses || []).map(c => {
         let attemptText = "1st Attempt";
-        if (c.repeatCleared || c.attempt === 2 || c.isRepeat) {
+        if (c.repeatCleared || Number(c.attempt) === 2 || c.attempt === 2 || c.isRepeat) {
           attemptText = "2nd Attempt";
         } else if (["I(SE)", "I(CA)", "E", "DFR", "AB", "INC"].includes(c.grade)) {
           attemptText = "Repeat Req.";

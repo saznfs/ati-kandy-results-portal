@@ -209,6 +209,15 @@ foreach ($file in $rawFiles) {
             if ($c.isNgpa) {
                 $courseObj["isNgpa"] = $true
             }
+            if ($null -ne $c.attempt) {
+                $courseObj["attempt"] = [int]$c.attempt
+            }
+            if ($null -ne $c.repeatCleared) {
+                $courseObj["repeatCleared"] = [bool]$c.repeatCleared
+            }
+            if ($null -ne $c.isRepeat) {
+                $courseObj["isRepeat"] = [bool]$c.isRepeat
+            }
             $coursesList.Add($courseObj) | Out-Null
         }
 
@@ -219,14 +228,18 @@ foreach ($file in $rawFiles) {
             $calcSgpa
         }
 
-        $students[$idx].semesters.Add([ordered]@{
+        $semObj = [ordered]@{
             year = $year
             semester = $sem
             semesterTitle = $semTitle
             sgpa = $sgpa
             semesterCredits = $semCredits
             courses = $coursesList
-        }) | Out-Null
+        }
+        if ($rec.repeatUpgraded) {
+            $semObj["repeatUpgraded"] = [bool]$rec.repeatUpgraded
+        }
+        $students[$idx].semesters.Add($semObj) | Out-Null
     }
 }
 

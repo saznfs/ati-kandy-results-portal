@@ -349,7 +349,7 @@ const PortalUI = (() => {
    * Helper to determine attempt badge status (1st Attempt vs 2nd Attempt / Repeat)
    */
   function getAttemptInfo(course) {
-    if (course.repeatCleared || course.attempt === 2 || course.isRepeat) {
+    if (course.repeatCleared || Number(course.attempt) === 2 || course.attempt === 2 || course.isRepeat) {
       return {
         text: "2nd Attempt",
         badgeClass: "badge-attempt-2nd",
@@ -375,7 +375,7 @@ const PortalUI = (() => {
    */
   function renderSingleSemesterBlock(sem) {
     const courses = sem.courses || sem.subjects || [];
-    const hasRepeats = courses.some(c => c.repeatCleared || c.attempt === 2 || c.isRepeat);
+    const hasRepeats = courses.some(c => c.repeatCleared || Number(c.attempt) === 2 || c.attempt === 2 || c.isRepeat);
 
     const headerActions = [
       el("span", { class: "semester-sgpa-pill" }, `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`)
