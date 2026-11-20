@@ -449,7 +449,11 @@ const PortalUI = (() => {
    */
   async function copyResultSummary(student, btn) {
     const originalText = btn.textContent;
-    const honours = getHonoursClassification(student.cgpa);
+    const chkMain = document.getElementById("chkIncludeHonours");
+    const showHonours = chkMain ? chkMain.checked : true;
+    const honours = (showHonours && typeof getHonoursClassification === "function")
+      ? getHonoursClassification(student.cgpa)
+      : null;
     let shareUrl = window.location.href;
     try {
       const urlObj = new URL(window.location.href);
@@ -460,7 +464,7 @@ const PortalUI = (() => {
     }
 
     const semGpas = (student.semesters || []).map(s => `Y${s.year}S${s.semester}: ${Number(s.sgpa || 0).toFixed(2)}`).join(" | ");
-    const honoursLine = (honours && honours.title && honours.minCgpa >= 2.0)
+    const honoursLine = (showHonours && honours && honours.title && honours.minCgpa >= 2.0)
       ? `\n🏆 Academic Standing: ${honours.title}${student.cgpa && Number(student.cgpa) > 0 ? ` (CGPA: ${Number(student.cgpa).toFixed(2)})` : ""}`
       : "";
 

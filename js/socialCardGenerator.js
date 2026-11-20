@@ -778,10 +778,11 @@ const PortalSocialCardGenerator = (() => {
     if (currentStudent) {
       const studentName = currentStudent.name || "Student";
       const indexNo = currentStudent.indexNumber || "";
-      const honours = (typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
+      const showHonours = currentOptions.showHonours !== false;
+      const honours = (showHonours && typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
         ? PortalUI.getHonoursClassification(currentStudent.cgpa)
         : null;
-      const honoursLine = (honours && honours.title && honours.minCgpa >= 2.0)
+      const honoursLine = (showHonours && honours && honours.title && honours.minCgpa >= 2.0)
         ? `\n🏆 Academic Standing: ${honours.title}${currentStudent.cgpa ? ` (CGPA: ${Number(currentStudent.cgpa).toFixed(2)})` : ""}`
         : "";
 
