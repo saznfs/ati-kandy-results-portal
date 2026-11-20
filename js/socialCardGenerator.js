@@ -182,14 +182,14 @@ const PortalSocialCardGenerator = (() => {
     const height = 1080;
     const maxContentWidth = 920;
 
-    // 1. Header Emblem & Title
-    drawEmblemBadge(width / 2, 55, theme, 26);
+    // 1. Header Emblem & Title (Enhanced logo size with clean clearance)
+    drawEmblemBadge(width / 2, 92, theme, 40);
 
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      122,
-      26,
+      168,
+      24,
       3.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -200,17 +200,17 @@ const PortalSocialCardGenerator = (() => {
     // 2. Student Identity Card Box
     const cardMargin = 60;
     const cardWidth = width - (cardMargin * 2); // 960px
-    const cardY = 155;
-    const cardHeight = 168;
+    const cardY = 192;
+    const cardHeight = 154;
 
-    drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 22, theme);
+    drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 20, theme);
 
     // Student Name (Prominent & bold)
     drawFittedText(
       student.name || "Student Name",
       width / 2,
-      cardY + 48,
-      42,
+      cardY + 44,
+      38,
       -0.5,
       cardWidth - 50,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -224,8 +224,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       `${progText}  •  ${campusText}`,
       width / 2,
-      cardY + 90,
-      24,
+      cardY + 82,
+      22,
       0.5,
       cardWidth - 60,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -237,8 +237,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       `Index No: ${student.indexNumber}`,
       width / 2,
-      cardY + 132,
-      24,
+      cardY + 122,
+      22,
       0.5,
       cardWidth - 60,
       "'Courier New', monospace",
@@ -248,22 +248,22 @@ const PortalSocialCardGenerator = (() => {
 
     // 3. Honours Classification Banner (Conditional)
     const showHonours = currentOptions.showHonours !== false;
-    let gridTitleY = 426;
-    let gridY = 452;
-    let rowH = 195;
+    let gridTitleY = 438;
+    let gridY = 460;
+    let rowH = 184;
 
     if (showHonours) {
       const honours = PortalUI.getHonoursClassification(student.cgpa);
       const bannerW = 640;
-      const bannerH = 50;
-      const bannerY = 340;
-      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 25, theme, true);
+      const bannerH = 46;
+      const bannerY = 364;
+      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 23, theme, true);
 
       drawFittedText(
         `★  ${honours.title.toUpperCase()}  ★`,
         width / 2,
-        bannerY + 33,
-        22,
+        bannerY + 31,
+        20,
         1.5,
         bannerW - 30,
         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -272,9 +272,9 @@ const PortalSocialCardGenerator = (() => {
       );
     } else {
       // Re-balance grid coordinates when honours banner is hidden
-      gridTitleY = 356;
-      gridY = 390;
-      rowH = 226;
+      gridTitleY = 372;
+      gridY = 398;
+      rowH = 214;
     }
 
     // 4. All Semester GPAs Showcase (2x2 Grid)
@@ -282,7 +282,7 @@ const PortalSocialCardGenerator = (() => {
       "ACADEMIC SEMESTER GPA",
       width / 2,
       gridTitleY,
-      20,
+      18,
       3,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -298,7 +298,7 @@ const PortalSocialCardGenerator = (() => {
       const col = i % 2;
       const row = Math.floor(i / 2);
       const cx = gridX + col * (colW + 24);
-      const cy = gridY + row * (rowH + 20);
+      const cy = gridY + row * (rowH + 16);
 
       const s = sems[i];
       const semLabel = s ? `YEAR ${s.year} • SEMESTER ${s.semester}` : `SEMESTER ${i + 1}`;
@@ -310,8 +310,8 @@ const PortalSocialCardGenerator = (() => {
       drawFittedText(
         semLabel,
         cx + colW / 2,
-        cy + (showHonours ? 42 : 48),
-        22,
+        cy + (showHonours ? 38 : 44),
+        20,
         1,
         colW - 30,
         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -324,33 +324,33 @@ const PortalSocialCardGenerator = (() => {
       ctx.strokeStyle = theme.cardBorder;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(cx + 35, cy + (showHonours ? 58 : 66));
-      ctx.lineTo(cx + colW - 35, cy + (showHonours ? 58 : 66));
+      ctx.moveTo(cx + 35, cy + (showHonours ? 52 : 60));
+      ctx.lineTo(cx + colW - 35, cy + (showHonours ? 52 : 60));
       ctx.stroke();
       ctx.restore();
 
       // Large GPA value (Huge & bold)
       ctx.textAlign = "center";
       ctx.fillStyle = theme.gold;
-      ctx.font = `900 ${showHonours ? "68px" : "74px"} 'Courier New', monospace`;
-      ctx.fillText(semGpa, cx + colW / 2, cy + (showHonours ? 130 : 148));
+      ctx.font = `900 ${showHonours ? "64px" : "70px"} 'Courier New', monospace`;
+      ctx.fillText(semGpa, cx + colW / 2, cy + (showHonours ? 122 : 138));
 
       // Semester GPA Label
       ctx.fillStyle = theme.textSecondary;
-      ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + (showHonours ? 164 : 190));
+      ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + (showHonours ? 154 : 176));
     }
 
     // 5. Milestone Pill
     const semCount = sems.length > 0 ? sems.length : 4;
-    const statPillY = 896;
+    const statPillY = 878;
     const statPillW = 540;
-    drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 52, 26, theme);
+    drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 46, 23, theme);
     drawFittedText(
       `Completed Semesters: ${semCount}`,
       width / 2,
-      statPillY + 34,
-      22,
+      statPillY + 30,
+      20,
       1,
       statPillW - 40,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -362,8 +362,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      995,
-      20,
+      975,
+      19,
       3.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -381,14 +381,14 @@ const PortalSocialCardGenerator = (() => {
     const height = 1920;
     const maxContentWidth = 920;
 
-    // 1. Header Emblem & Title
-    drawEmblemBadge(width / 2, 102, theme, 36);
+    // 1. Header Emblem & Title (Enhanced prominent logo with clean clearance)
+    drawEmblemBadge(width / 2, 145, theme, 68);
 
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      192,
-      34,
+      268,
+      36,
       4,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -399,7 +399,7 @@ const PortalSocialCardGenerator = (() => {
     // 2. Student Identity Card Box
     const cardMargin = 60;
     const cardWidth = width - (cardMargin * 2); // 960px
-    const cardY = 250;
+    const cardY = 312;
     const cardHeight = 195;
     drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 24, theme);
 
@@ -446,16 +446,16 @@ const PortalSocialCardGenerator = (() => {
 
     // 3. Honours Banner (Conditional)
     const showHonours = currentOptions.showHonours !== false;
-    let sectionTitleY = 575;
-    let yStart = 615;
+    let sectionTitleY = 636;
+    let yStart = 668;
     let semCardH = 160;
-    let semGap = 26;
+    let semGap = 24;
 
     if (showHonours) {
       const honours = PortalUI.getHonoursClassification(student.cgpa);
       const bannerW = 660;
       const bannerH = 58;
-      const bannerY = 470;
+      const bannerY = 532;
       drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 29, theme, true);
 
       drawFittedText(
@@ -471,10 +471,10 @@ const PortalSocialCardGenerator = (() => {
       );
     } else {
       // Re-balance vertical rhythm when honours banner is hidden
-      sectionTitleY = 480;
-      yStart = 520;
+      sectionTitleY = 544;
+      yStart = 576;
       semCardH = 180;
-      semGap = 28;
+      semGap = 26;
     }
 
     // 4. All Semester GPAs Section Title
@@ -534,7 +534,7 @@ const PortalSocialCardGenerator = (() => {
 
     // 6. Milestone Pill
     const semCount = sems.length > 0 ? sems.length : 4;
-    const statPillY = yStart + 4 * (semCardH + semGap) + 20;
+    const statPillY = 1420;
     const statPillW = 600;
     drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 58, 29, theme);
     drawFittedText(
@@ -550,7 +550,7 @@ const PortalSocialCardGenerator = (() => {
     );
 
     // 7. Verified Credential Badge
-    const badgeY = statPillY + 84;
+    const badgeY = 1500;
     const badgeW = 680;
     drawGlassCard((width - badgeW) / 2, badgeY, badgeW, 52, 26, theme);
     drawFittedText(
@@ -672,15 +672,16 @@ const PortalSocialCardGenerator = (() => {
         const cardW = cardH * aspect;
         const rx = cx - cardW / 2;
         const ry = cy - cardH / 2;
+        const cornerR = Math.max(4, Math.round(cardH * 0.06));
 
         // Subtle glow & card backing
         ctx.save();
         ctx.shadowColor = theme.accentGlow || "rgba(245, 158, 11, 0.35)";
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
         ctx.fillStyle = "#ffffff";
         ctx.beginPath();
         if (typeof ctx.roundRect === "function") {
-          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, 6);
+          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, cornerR + 1);
         } else {
           ctx.rect(rx - 2, ry - 2, cardW + 4, cardH + 4);
         }
@@ -691,7 +692,7 @@ const PortalSocialCardGenerator = (() => {
         ctx.save();
         ctx.beginPath();
         if (typeof ctx.roundRect === "function") {
-          ctx.roundRect(rx, ry, cardW, cardH, 5);
+          ctx.roundRect(rx, ry, cardW, cardH, cornerR);
         } else {
           ctx.rect(rx, ry, cardW, cardH);
         }
@@ -704,7 +705,7 @@ const PortalSocialCardGenerator = (() => {
         ctx.strokeStyle = theme.gold;
         ctx.beginPath();
         if (typeof ctx.roundRect === "function") {
-          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, 6);
+          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, cornerR + 1);
         } else {
           ctx.rect(rx - 2, ry - 2, cardW + 4, cardH + 4);
         }
