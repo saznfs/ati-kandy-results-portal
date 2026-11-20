@@ -324,6 +324,15 @@ const PortalUI = (() => {
   async function copyResultSummary(student, btn) {
     const originalText = btn.textContent;
     const honours = getHonoursClassification(student.cgpa);
+    let shareUrl = window.location.href;
+    try {
+      const urlObj = new URL(window.location.href);
+      urlObj.searchParams.set("index", student.indexNumber);
+      shareUrl = urlObj.toString();
+    } catch (e) {
+      shareUrl = `${window.location.origin}${window.location.pathname}?index=${encodeURIComponent(student.indexNumber)}`;
+    }
+
     const summary = [
       `🎓 SLIATE KANDY Academic Results`,
       `Student: ${student.name}`,
@@ -332,7 +341,7 @@ const PortalUI = (() => {
       `Campus: ${student.campus || "ATI"}`,
       `GPA: ${Number(student.cgpa).toFixed(2)}`,
       `Honours: ${honours.title}`,
-      `\nView results at: ${window.location.origin}${window.location.pathname}?index=${encodeURIComponent(student.indexNumber)}`
+      `\nView results at: ${shareUrl}`
     ].join("\n");
 
     try {

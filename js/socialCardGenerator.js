@@ -1,5 +1,5 @@
 /**
- * ATI SLIATE Unofficial Results Portal - Social Share Card Generator
+ * SLIATE KANDY Results Portal - Social Share Card Generator
  * High-resolution HTML5 Canvas rendering for 9:16 Story (1080x1920) and 1:1 Post (1080x1080)
  * with custom aesthetic themes, auto-fitted responsive typography, zero text clipping,
  * and Web Share API integration.
@@ -789,10 +789,10 @@ const PortalSocialCardGenerator = (() => {
     const link = document.createElement("a");
     const namePart = (currentStudent && currentStudent.indexNumber)
       ? currentStudent.indexNumber.replace(/[\/\\]/g, "_")
-      : "achievement";
+      : "result";
     const aspectPart = currentOptions.aspectRatio === "9:16" ? "Story_9x16" : "Post_1x1";
 
-    link.download = `ATI_SLIATE_${namePart}_${aspectPart}.png`;
+    link.download = `SLIATE_KANDY_${namePart}_${aspectPart}.png`;
     link.href = dataUrl;
     document.body.appendChild(link);
     link.click();
@@ -805,6 +805,29 @@ const PortalSocialCardGenerator = (() => {
   async function shareCard() {
     if (!canvas) return;
 
+    const namePart = (currentStudent && currentStudent.indexNumber)
+      ? currentStudent.indexNumber.replace(/[\/\\]/g, "_")
+      : "result";
+    const aspectPart = currentOptions.aspectRatio === "9:16" ? "Story" : "Post";
+    const fileName = `SLIATE_KANDY_${namePart}_${aspectPart}.png`;
+    const shareTitle = "SLIATE KANDY Examination Result";
+    const gpaStr = (currentStudent && currentStudent.cgpa != null) ? Number(currentStudent.cgpa).toFixed(2) : "";
+    const shareText = currentStudent
+      ? `SLIATE Kandy Examination Results - ${currentStudent.name}${gpaStr ? ` (GPA: ${gpaStr})` : ""}`
+      : "SLIATE KANDY Examination Results";
+
+    // Build absolute URL for the student's result
+    let shareUrl = window.location.href;
+    try {
+      const urlObj = new URL(window.location.href);
+      if (currentStudent && currentStudent.indexNumber) {
+        urlObj.searchParams.set("index", currentStudent.indexNumber);
+      }
+      shareUrl = urlObj.toString();
+    } catch (e) {
+      // fallback
+    }
+
     try {
       canvas.toBlob(async (blob) => {
         if (!blob) {
@@ -812,18 +835,60 @@ const PortalSocialCardGenerator = (() => {
           return;
         }
 
-        const fileName = `ATI_Result_${currentOptions.aspectRatio === "9:16" ? "Story" : "Post"}.png`;
         const file = new File([blob], fileName, { type: "image/png" });
 
+        // Level 1: Full file sharing via Web Share API (Mobile Chrome / Safari)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: "My ATI SLIATE Examination Result",
-            text: `Check out my academic results from ATI SLIATE! (CGPA: ${Number(currentStudent.cgpa).toFixed(2)})`
-          });
-        } else {
-          downloadCard();
-          alert("Direct sharing is not supported in this browser. The image has been downloaded so you can share it directly!");
+          try {
+            await navigator.share({
+              files: [file],
+              title: shareTitle,
+              text: `${shareText}\n${shareUrl}`,
+              url: shareUrl
+            });
+            return;
+          } catch (fileShareErr) {
+            if (fileShareErr.name === "AbortError") return;
+            // Retry sharing file without url parameter if combined payload is rejected
+            try {
+              await navigator.share({
+                files: [file],
+                title: shareTitle,
+                text: `${shareText}\n${shareUrl}`
+              });
+              return;
+            } catch (retryErr) {
+              if (retryErr.name === "AbortError") return;
+            }
+          }
+        }
+
+        // Level 2: Text/URL sharing via Web Share API (Desktop Chrome / Safari / Edge)
+        if (navigator.share) {
+          try {
+            downloadCard();
+            await navigator.share({
+              title: shareTitle,
+              text: shareText,
+              url: shareUrl
+            });
+            return;
+          } catch (urlShareErr) {
+            if (urlShareErr.name === "AbortError") return;
+          }
+        }
+
+        // Level 3: Fallback for browsers without Web Share API (Desktop Firefox / older browsers)
+        downloadCard();
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+            alert("Card image downloaded and result link copied to clipboard! You can now paste and share it directly.");
+          } else {
+            alert("Card image downloaded so you can share it directly!");
+          }
+        } catch (clipErr) {
+          alert("Card image downloaded so you can share it directly!");
         }
       }, "image/png", 1.0);
     } catch (err) {
