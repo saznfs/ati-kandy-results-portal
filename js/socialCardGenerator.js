@@ -183,13 +183,13 @@ const PortalSocialCardGenerator = (() => {
     const maxContentWidth = 920;
 
     // 1. Header Emblem & Title
-    drawEmblemBadge(width / 2, 75, theme, 30);
+    drawEmblemBadge(width / 2, 55, theme, 26);
 
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      126,
-      28,
+      122,
+      26,
       3.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -382,13 +382,13 @@ const PortalSocialCardGenerator = (() => {
     const maxContentWidth = 920;
 
     // 1. Header Emblem & Title
-    drawEmblemBadge(width / 2, 130, theme, 38);
+    drawEmblemBadge(width / 2, 102, theme, 36);
 
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      200,
-      36,
+      192,
+      34,
       4,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
