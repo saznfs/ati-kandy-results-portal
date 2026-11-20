@@ -85,41 +85,41 @@ const PortalPdfGenerator = (() => {
     // --- Page 1 Background & Header ---
     drawPageBackground(doc);
 
-    y = 18;
-
     // Academic Logo Emblem (Preserving exact aspect ratio of the official SLIATE crest)
     const logoImg = document.getElementById("siteLogo");
+    const logoTargetH = 14.5; // mm
+    const logoY = 12.5; // mm
+    const logoBottom = logoY + logoTargetH; // 27.0 mm
+
     if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
       try {
         const imgW = logoImg.naturalWidth || 426;
         const imgH = logoImg.naturalHeight || 565;
-        const targetH = 16;
-        const targetW = targetH * (imgW / imgH); // ~12.07mm
-        doc.addImage(logoImg, "PNG", margin + 2, 13.5, targetW, targetH);
+        const targetW = logoTargetH * (imgW / imgH); // ~10.93mm
+        doc.addImage(logoImg, "PNG", margin + 2, logoY, targetW, logoTargetH);
       } catch (e) {
         // Fallback gracefully if CORS prevents direct canvas read
       }
     }
 
-    // Title & Institute Name
+    // Title & Institute Name (Vertically centered relative to the logo)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(15, 43, 92);
-    doc.text("SLIATE KANDY", pageWidth / 2, y, { align: "center" });
+    doc.text("SLIATE KANDY", pageWidth / 2, 18, { align: "center" });
 
-    y += 6;
     doc.setFontSize(10.5);
     doc.setTextColor(37, 99, 235);
-    doc.text("EXAMINATION RESULTS RECORD", pageWidth / 2, y, { align: "center" });
+    doc.text("EXAMINATION RESULTS RECORD", pageWidth / 2, 24, { align: "center" });
 
-    // Decorative divider line
-    y += 4;
+    // Decorative divider line (strictly placed below both logo emblem and title texts)
+    const dividerY = Math.max(logoBottom + 2.5, 29.5); // 29.5 mm guarantees 2.5mm clearance below logo
     doc.setDrawColor(217, 119, 6);
     doc.setLineWidth(0.5);
-    doc.line(margin, y, pageWidth - margin, y);
+    doc.line(margin, dividerY, pageWidth - margin, dividerY);
 
     // --- 2. Candidate Information Box ---
-    y += 4;
+    y = dividerY + 3.5;
     const infoBoxTop = y;
     const infoBoxHeight = 32;
     doc.setFillColor(248, 250, 252);
