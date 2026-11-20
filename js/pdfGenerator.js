@@ -401,7 +401,7 @@ const PortalPdfGenerator = (() => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7.5);
       doc.setTextColor(148, 163, 184);
-      doc.text(`SLIATE KANDY • Generated: ${dateStr} • Ref: ${cleanRef}`, margin, pageHeight - 9);
+      doc.text(`SLIATE KANDY • www.sliate.ac.lk • Ref: ${cleanRef}`, margin, pageHeight - 9);
 
       // Accurate Page Count (Right)
       doc.setFont("helvetica", "bold");

@@ -93,6 +93,17 @@ const CONFIG = {
     "E":     "Marks 0 - 24 (Grade Point: 0.00 - Fail)"
   },
 
+  // Official SLIATE Contact & Channel Details
+  officialContact: {
+    website: "https://www.sliate.ac.lk",
+    websiteDisplay: "www.sliate.ac.lk",
+    helpDesk: "help@sliate.ac.lk",
+    youtube: "https://www.youtube.com/sliateofficial",
+    facebook: "https://www.facebook.com/sliate.ac.lk",
+    telephones: ["+94112691307", "+94112691319"],
+    telephonesDisplay: "+94 11 269 1307 / +94 11 269 1319"
+  },
+
   // Academic Honours Classification
   honoursClass: [
     { minCgpa: 3.70, title: "First Class Honours", badgeClass: "standing-first-class" },
