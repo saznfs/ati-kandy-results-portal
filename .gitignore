@@ -32,6 +32,9 @@ pnpm-debug.log*
 ehthumbs.db
 Thumbs.db
 
+# Developer parsing scripts
+scripts/parse-*.ps1
+
 # IDE & Editor files
 .vscode/
 .idea/

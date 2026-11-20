@@ -33,7 +33,7 @@
     width: 100%;
     text-align: center;
     padding: var(--space-3) var(--space-2);
-    font-size: 1rem;
+    font-size: 16px; /* Explicitly enforce >= 16px to prevent iOS Safari auto-zoom */
   }
 
   .search-icon-wrapper {
@@ -160,6 +160,7 @@
   /* Modal Mobile Adaptations */
   .modal-card {
     max-height: 94vh;
+    max-height: 94dvh;
     border-radius: var(--radius-lg);
   }
 
@@ -200,6 +201,20 @@
 
   .badge-unofficial {
     display: none; /* Keep header minimal on ultra small screens */
+  }
+
+  /* Compact grading guide button to prevent header horizontal overflow */
+  .btn-grading-guide span:not([aria-hidden]) {
+    display: none;
+  }
+  .btn-grading-guide {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: var(--radius-full);
   }
 }
 

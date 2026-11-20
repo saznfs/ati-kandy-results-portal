@@ -4,77 +4,255 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Page Not Found - SLIATE KANDY Results Portal</title>
+  <meta name="description" content="The requested page or examination record was not found. Return to SLIATE Kandy Results Portal.">
   <meta name="theme-color" content="#0f2b5c">
-  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
-  <link rel="icon" type="image/png" sizes="64x64" href="assets/images/favicon.png">
-  <link rel="apple-touch-icon" href="assets/images/sliate-logo.png">
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Security & Content Security Policy (Strict Self-Contained CSP) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self';">
+
+  <!-- Canonical & Social Metadata -->
+  <link rel="canonical" href="https://saznfs.github.io/ati-kandy-results-portal/404.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SLIATE KANDY">
+  <meta property="og:title" content="Page Not Found - SLIATE KANDY Results Portal">
+  <meta property="og:description" content="The requested page or examination record was not found. Return to SLIATE Kandy Results Portal.">
+  <meta property="og:url" content="https://saznfs.github.io/ati-kandy-results-portal/404.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Page Not Found - SLIATE KANDY Results Portal">
+  <meta name="twitter:description" content="The requested page could not be found. Return to SLIATE Kandy Results Portal.">
+
+  <!-- Favicon via inline data SVG (no external dependency) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='5' y='2' width='54' height='60' rx='4' fill='%23f59e0b'/%3E%3Cpolygon points='26,13 38,27 26,41 14,27' fill='none' stroke='%2321155E' stroke-width='3'/%3E%3Cpolygon points='38,13 50,27 38,41 26,27' fill='none' stroke='%2321155E' stroke-width='3'/%3E%3Ctext x='32' y='52' text-anchor='middle' font-family='serif' font-size='9' font-weight='bold' fill='%2321155E'%3ESLIATE%3C/text%3E%3C/svg%3E">
+
   <style>
-    .not-found-wrap {
-      min-height: 70vh;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    :root {
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --brand-primary: #0f2b5c;
+      --brand-accent: #2563eb;
+      --brand-accent-hover: #1d4ed8;
+      --color-gold: #d97706;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-page: #0b1120;
+        --bg-surface: #111a2e;
+        --border-color: #243556;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --brand-accent: #3b82f6;
+        --brand-accent-hover: #60a5fa;
+      }
+    }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    .site-header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+    }
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .brand-crest {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-title {
+      font-size: 1.125rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: block;
+    }
+    .not-found-main {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: var(--space-8) var(--space-4);
+      padding: 2.5rem 1rem;
+      max-width: 580px;
+      margin: 0 auto;
     }
     .not-found-code {
-      font-size: 5rem;
+      font-size: 5.5rem;
       font-weight: 900;
       font-family: var(--font-mono);
       color: var(--brand-accent);
       line-height: 1;
-      margin-bottom: var(--space-2);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.03em;
     }
     .not-found-title {
-      font-size: 1.5rem;
-      margin-bottom: var(--space-3);
+      font-size: 1.625rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
     }
     .not-found-desc {
-      max-width: 480px;
-      margin-bottom: var(--space-6);
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    .action-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+    }
+    .btn-search {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.875rem 1.75rem;
+      background-color: var(--brand-accent);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      min-height: 44px;
+      transition: background-color 150ms ease;
+    }
+    .btn-search:hover {
+      background-color: var(--brand-accent-hover);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.875rem 1.5rem;
+      background-color: var(--bg-surface);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      border: 1px solid var(--border-color);
+      border-radius: 9999px;
+      text-decoration: none;
+      min-height: 44px;
+      transition: border-color 150ms ease, color 150ms ease;
+    }
+    .btn-secondary:hover {
+      border-color: var(--brand-accent);
+      color: var(--brand-accent);
+    }
+    .site-footer {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+    .footer-content {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 1rem;
+    }
+    .footer-links a:hover {
+      color: var(--brand-accent);
     }
   </style>
 </head>
 <body>
   <header class="site-header" role="banner">
-    <div class="container header-container">
-      <a href="index.html" class="brand-link">
-        <div class="brand-logo-wrapper">
-          <img src="assets/images/sliate-logo.png" alt="SLIATE Logo" class="brand-logo" width="44" height="44">
-        </div>
-        <div class="brand-info">
-          <div class="brand-title">
-            <span>SLIATE KANDY</span>
-          </div>
-          <span class="brand-subtitle">Results Portal</span>
-        </div>
-      </a>
-    </div>
+    <a href="/ati-kandy-results-portal/" class="brand-link" aria-label="SLIATE Kandy Results Portal Home">
+      <div class="brand-crest" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+          <defs>
+            <radialGradient id="headerGold" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="65%" stop-color="#fff2c2"/>
+              <stop offset="100%" stop-color="#f59e0b"/>
+            </radialGradient>
+          </defs>
+          <rect x="4" y="2" width="56" height="60" rx="4" fill="url(#headerGold)" stroke="#f59e0b" stroke-width="2"/>
+          <g fill="none" stroke="#21155E" stroke-width="3">
+            <polygon points="26,13 38,27 26,41 14,27"/>
+            <polygon points="38,13 50,27 38,41 26,27"/>
+          </g>
+          <text x="32" y="52" text-anchor="middle" font-family="serif" font-size="9" font-weight="bold" fill="#21155E">SLIATE</text>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">SLIATE KANDY</div>
+        <span class="brand-subtitle">Results Portal</span>
+      </div>
+    </a>
   </header>
 
-  <main class="container not-found-wrap" role="main">
+  <main class="not-found-main" role="main">
     <div class="not-found-code">404</div>
-    <h1 class="not-found-title">Page or Result Record Not Found</h1>
+    <h1 class="not-found-title">Page or Record Not Found</h1>
     <p class="not-found-desc">
-      The requested page or result route does not exist. If you were searching for your examination results, please return to the search portal.
+      The requested route or examination record was not found. If you were searching for your examination results, return to the results portal.
     </p>
-    <a href="index.html" class="btn-search" style="display: inline-flex; text-decoration: none;">
-      <span>Return to Results Search</span>
-    </a>
+    <div class="action-group">
+      <a href="/ati-kandy-results-portal/" class="btn-search">
+        <span>Return to Results Search</span>
+      </a>
+      <a href="index.html" class="btn-secondary">
+        <span>Direct Home (Local)</span>
+      </a>
+    </div>
   </main>
 
   <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <div class="footer-nav">
-        <div>&copy; 2026 SLIATE KANDY. All rights reserved.</div>
-        <div class="footer-links">
-          <a href="mailto:sazninfs@gmail.com?subject=SLIATE%20Kandy%20Results%20Portal%20-%20Issue%20or%20Result%20Removal%20Request">Request Issue / Result Removal</a>
-          <a href="index.html">Home</a>
-        </div>
+    <div class="footer-content">
+      <div>&copy; 2026 SLIATE KANDY. All rights reserved.</div>
+      <div class="footer-links">
+        <a href="mailto:sazninfs@gmail.com?subject=SLIATE%20Kandy%20Results%20Portal%20-%20Issue%20or%20Result%20Removal%20Request">Request Issue / Removal</a>
+        <a href="/ati-kandy-results-portal/">Home</a>
       </div>
     </div>
   </footer>

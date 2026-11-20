@@ -478,7 +478,7 @@ const PortalUI = (() => {
         btn.textContent = originalText;
       }, 2500);
     } catch (e) {
-      alert("Failed to copy. Please manually copy:\n\n" + summary);
+      showError("Failed to copy automatically. Please copy the summary manually:\n\n" + summary, true);
     }
   }
 

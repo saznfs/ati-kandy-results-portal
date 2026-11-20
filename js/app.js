@@ -6,6 +6,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // App State
   let currentStudentData = null;
+  let activeSearchController = null;
+  let lastActiveTrigger = null;
+  let activeModalTrapCleanup = null;
 
   // DOM Elements
   const searchForm = document.getElementById("searchForm");
@@ -66,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 5. Input Auto-Formatting & Clear Button
   function syncClearButton() {
     if (searchClearBtn && indexInput) {
-      searchClearBtn.style.display = indexInput.value.trim().length > 0 ? "block" : "none";
+      searchClearBtn.style.display = indexInput.value.trim().length > 0 ? "flex" : "none";
     }
   }
 
@@ -84,15 +87,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (searchClearBtn) {
       searchClearBtn.addEventListener("click", () => {
+        if (activeSearchController) {
+          activeSearchController.abort();
+        }
         indexInput.value = "";
         syncClearButton();
         PortalUI.clearResults();
         currentStudentData = null;
-        window.history.replaceState({}, "", window.location.pathname);
+        if (window.location.search) {
+          window.history.pushState({}, "", window.location.pathname);
+        }
         indexInput.focus();
       });
     }
   }
+
+  // 6. Browser Back/Forward navigation support (popstate)
+  window.addEventListener("popstate", () => {
+    const params = new URLSearchParams(window.location.search);
+    const idx = params.get("index");
+    if (idx) {
+      const upper = idx.toUpperCase();
+      if (indexInput) {
+        indexInput.value = upper;
+        syncClearButton();
+      }
+      performSearch(upper, true);
+    } else {
+      if (activeSearchController) {
+        activeSearchController.abort();
+      }
+      if (indexInput) {
+        indexInput.value = "";
+        syncClearButton();
+      }
+      currentStudentData = null;
+      PortalUI.clearResults();
+    }
+  });
 
   // 6. Search Form Submission
   if (searchForm) {
@@ -104,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 8. Core Search Flow
-  async function performSearch(rawIndex) {
+  async function performSearch(rawIndex, fromPopstate = false) {
     // A. Offline network pre-check
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       PortalUI.showError("You appear to be offline. Please check your internet connection and try again.", true);
@@ -130,6 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Cancel any previous in-flight fetch
+    if (activeSearchController) {
+      activeSearchController.abort();
+    }
+    activeSearchController = new AbortController();
+    const { signal } = activeSearchController;
+
     // D. Set Loading State
     PortalUI.setLoading(true);
 
@@ -139,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const fileUrl = `data/encrypted/${fileHash}.json`;
 
       // F. Fetch the encrypted JSON blob
-      const response = await fetch(fileUrl, { cache: "no-store" });
+      const response = await fetch(fileUrl, { cache: "no-store", signal });
       if (!response.ok) {
         if (response.status === 404) {
           PortalUI.showError(
@@ -166,10 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
       bindResultActionButtons();
 
       // J. Update URL search query cleanly without reload or carrying leftover params
-      const cleanUrl = `${window.location.pathname}?index=${encodeURIComponent(normalizedIndex)}`;
-      window.history.replaceState({}, "", cleanUrl);
+      const targetQuery = `?index=${encodeURIComponent(normalizedIndex)}`;
+      const cleanUrl = `${window.location.pathname}${targetQuery}`;
+      if (!fromPopstate && window.location.search !== targetQuery) {
+        window.history.pushState({ index: normalizedIndex }, "", cleanUrl);
+      }
 
     } catch (err) {
+      if (err.name === "AbortError") {
+        return; // Stale fetch aborted by user action or rapid search
+      }
       console.error("Search error:", err);
       if (err instanceof TypeError || (err.message && err.message.toLowerCase().includes("failed to fetch"))) {
         PortalUI.showError("Network connection error. Unable to retrieve result data. Please check your internet connection.", true);
@@ -177,7 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
         PortalUI.showError(err.message || "An unexpected error occurred while processing the result.");
       }
     } finally {
-      PortalUI.setLoading(false);
+      if (!signal.aborted) {
+        PortalUI.setLoading(false);
+      }
     }
   }
 
@@ -214,12 +261,74 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 10. Social Card Modal Controls
+  // 10. Modal Focus Trapping & Accessibility Helpers
+  function trapFocusInModal(modalEl, closeFn) {
+    if (activeModalTrapCleanup) {
+      activeModalTrapCleanup();
+    }
+
+    const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeFn();
+        return;
+      }
+      if (e.key === "Tab") {
+        const focusableElements = Array.from(modalEl.querySelectorAll(focusableSelectors)).filter(
+          el => !el.disabled && el.offsetParent !== null
+        );
+        if (focusableElements.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Initial focus on close button or first focusable element
+    const closeBtn = modalEl.querySelector(".modal-close-btn");
+    if (closeBtn) {
+      closeBtn.focus();
+    } else {
+      const first = modalEl.querySelector(focusableSelectors);
+      if (first) first.focus();
+    }
+
+    activeModalTrapCleanup = () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      activeModalTrapCleanup = null;
+      if (lastActiveTrigger && typeof lastActiveTrigger.focus === "function") {
+        lastActiveTrigger.focus();
+        lastActiveTrigger = null;
+      }
+    };
+  }
+
+  // Social Card Modal Controls
   function openSocialModal() {
     if (!currentStudentData || !socialModal) return;
+    lastActiveTrigger = document.activeElement;
     socialModal.classList.add("active");
     socialModal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden"; // lock scroll
+    trapFocusInModal(socialModal, closeSocialModal);
 
     const chkMain = document.getElementById("chkIncludeHonours");
     const showHonours = chkMain ? chkMain.checked : true;
@@ -235,6 +344,9 @@ document.addEventListener("DOMContentLoaded", () => {
     socialModal.classList.remove("active");
     socialModal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    if (activeModalTrapCleanup) {
+      activeModalTrapCleanup();
+    }
   }
 
   if (modalCloseBtn) {
@@ -248,13 +360,6 @@ document.addEventListener("DOMContentLoaded", () => {
         closeSocialModal();
       }
     });
-
-    // Close on Escape key
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && socialModal.classList.contains("active")) {
-        closeSocialModal();
-      }
-    });
   }
 
   // 11. Official Grading Scheme Modal Controls (Section 5.9 & 5.10)
@@ -265,9 +370,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openGradingModal() {
     if (!gradingModal) return;
+    lastActiveTrigger = document.activeElement;
     gradingModal.classList.add("active");
     gradingModal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    trapFocusInModal(gradingModal, closeGradingModal);
   }
 
   function closeGradingModal() {
@@ -275,6 +382,9 @@ document.addEventListener("DOMContentLoaded", () => {
     gradingModal.classList.remove("active");
     gradingModal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    if (activeModalTrapCleanup) {
+      activeModalTrapCleanup();
+    }
   }
 
   if (btnOpenGradingModal) btnOpenGradingModal.addEventListener("click", openGradingModal);
@@ -284,11 +394,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (gradingModal) {
     gradingModal.addEventListener("click", (e) => {
       if (e.target === gradingModal) closeGradingModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && gradingModal.classList.contains("active")) {
-        closeGradingModal();
-      }
     });
   }
 
@@ -344,12 +449,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 11. Auto-search on page load if ?index= query parameter exists
+  // 12. Auto-search on page load if ?index= query parameter exists
   const urlParams = new URLSearchParams(window.location.search);
   const initialIndex = urlParams.get("index");
   if (initialIndex && indexInput) {
     indexInput.value = initialIndex.toUpperCase();
-    if (searchClearBtn) searchClearBtn.style.display = "block";
-    performSearch(initialIndex);
+    syncClearButton();
+    performSearch(initialIndex, true);
   }
 });

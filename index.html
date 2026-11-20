@@ -64,6 +64,9 @@
 </head>
 
 <body>
+  <!-- Skip to main content link for keyboard accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Header & Navigation -->
   <header class="site-header" role="banner">
     <div class="container header-container">
@@ -135,6 +138,7 @@
                 </svg>
               </div>
 
+              <label for="indexInput" class="sr-only">Student Index Number</label>
               <input type="text" id="indexInput" class="search-input" placeholder="e.g. KAN/IT/2324/F/xxx"
                 autocomplete="off" spellcheck="false" required aria-label="Enter your Student Index Number">
 
@@ -415,7 +419,7 @@
         </div>
         <div class="footer-links">
           <a id="reportIssueLink" href="#" target="_blank" rel="noopener noreferrer">Request Issue / Result Removal</a>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Project</a>
+          <a href="https://github.com/saznfs/ati-kandy-results-portal" target="_blank" rel="noopener noreferrer">GitHub Project</a>
         </div>
       </div>
     </div>

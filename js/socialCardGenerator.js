@@ -866,8 +866,6 @@ const PortalSocialCardGenerator = (() => {
         await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
         if (typeof PortalUI !== "undefined" && PortalUI.showError) {
           PortalUI.showError("Card image downloaded and result link copied to clipboard! You can paste and share it directly.", true);
-        } else {
-          alert("Card image downloaded and result link copied to clipboard!");
         }
       } else {
         if (typeof PortalUI !== "undefined" && PortalUI.showError) {
