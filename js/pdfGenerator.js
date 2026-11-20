@@ -211,7 +211,7 @@ const PortalPdfGenerator = (() => {
       const isYearBreak = (sIdx > 0 && sem.year > semesters[sIdx - 1].year && semesters.length >= 3);
       const coursesCount = (sem.courses || []).length;
       const estimatedSemesterHeight = 8 + 7 + (coursesCount * 6.2) + 6;
-      const spaceRemaining = pageHeight - 24 - y;
+      const spaceRemaining = pageHeight - 27 - y;
       const shouldBreakPage = isYearBreak || (estimatedSemesterHeight > spaceRemaining);
 
       if (shouldBreakPage && y > 70) {
@@ -280,7 +280,7 @@ const PortalPdfGenerator = (() => {
 
       doc.autoTable({
         startY: y,
-        margin: { left: margin, right: margin, bottom: 20 },
+        margin: { left: margin, right: margin, bottom: 27 },
         head: [["Course Code", "Course Title", "Grade", "Points", "Attempt"]],
         body: tableData,
         theme: "plain",
@@ -328,7 +328,7 @@ const PortalPdfGenerator = (() => {
     const boxHeight = showHonours ? 31 : 22;
     const neededSpace = boxHeight + 4;
 
-    if ((pageHeight - 22 - y) < neededSpace) {
+    if ((pageHeight - 27 - y) < neededSpace) {
       doc.addPage();
       drawPageBackground(doc);
       y = 22;
@@ -409,31 +409,41 @@ const PortalPdfGenerator = (() => {
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
 
-      // Official SLIATE Grading Scheme Key (Section 5.9 & 5.10)
+      // Official SLIATE Grading Scheme Key (Section 5.9 & 5.10) - split into 2 centered lines within page bounds
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(6.2);
+      doc.setFontSize(5.8);
       doc.setTextColor(148, 163, 184);
+
+      // Line 1: Grade Scale (5.10)
       doc.text(
-        "SLIATE Key (5.10): A+/A (4.00), A- (3.70), B+ (3.30), B (3.00), B- (2.70), C+ (2.30), C (2.00 Pass), C- (1.70), D+ (1.30), D (1.00), E (0.00 Fail) • (5.9): I(SE) Exam < 40 | I(CA) CA Missing | DFR Deferred | AB Absent",
+        "Grading System (5.10): A+/A (4.00) | A- (3.70) | B+ (3.30) | B (3.00) | B- (2.70) | C+ (2.30) | C (2.00 Pass) | C- (1.70) | D+ (1.30) | D (1.00) | E (0.00 Fail)",
         pageWidth / 2,
-        pageHeight - 15.2,
+        pageHeight - 21.8,
         { align: "center" }
       );
 
-      // Footer divider line
+      // Line 2: Non-GPA & Incomplete Grades (5.9)
+      doc.text(
+        "Non-GPA & Incomplete Grades (5.9): I(SE) Exam < 40 | I(CA) CA Missing | DFR Absent (Valid) | AB Absent | INC Incomplete",
+        pageWidth / 2,
+        pageHeight - 18.8,
+        { align: "center" }
+      );
+
+      // Footer divider line (safely above metadata and bottom borders)
       doc.setDrawColor(226, 232, 240);
       doc.setLineWidth(0.3);
-      doc.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+      doc.line(margin, pageHeight - 16.5, pageWidth - margin, pageHeight - 16.5);
 
-      // Footer Metadata (Left)
+      // Footer Metadata (Left) - safely inside inner gold border (bottom gold border is at pageHeight - 9.5)
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7.5);
       doc.setTextColor(148, 163, 184);
-      doc.text(`SLIATE KANDY • www.sliate.ac.lk • Ref: ${cleanRef}`, margin, pageHeight - 9);
+      doc.text(`SLIATE KANDY • www.sliate.ac.lk • Ref: ${cleanRef}`, margin, pageHeight - 12.5);
 
       // Accurate Page Count (Right)
       doc.setFont("helvetica", "bold");
-      doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 9, { align: "right" });
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 12.5, { align: "right" });
     }
 
     // Save PDF
