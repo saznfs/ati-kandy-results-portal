@@ -623,6 +623,15 @@ const PortalSocialCardGenerator = (() => {
    * Helper: Draw vector cap emblem fallback when image logo is unavailable or tainted
    */
   function drawVectorEmblemFallback(cx, cy, theme, radius = 30) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = theme.gold;
+    ctx.stroke();
+
     const scale = radius / 30;
 
     // Fallback Cap icon inside badge
@@ -644,31 +653,65 @@ const PortalSocialCardGenerator = (() => {
     ctx.lineTo(cx, cy + 5 * scale);
     ctx.closePath();
     ctx.fill();
+    ctx.restore();
   }
 
   /**
-   * Helper: Draw top academic emblem badge with official SLIATE logo
+   * Helper: Draw top academic emblem badge with official SLIATE crest plaque
    */
   function drawEmblemBadge(cx, cy, theme, radius = 30) {
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = "#ffffff"; // Clean white background
-    ctx.fill();
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = theme.gold;
-    ctx.stroke();
 
     const img = getLogoImage();
     if (!useFallbackLogo && img && img.complete && img.naturalWidth > 0) {
       try {
+        const aspect = (img.naturalWidth && img.naturalHeight)
+          ? (img.naturalWidth / img.naturalHeight)
+          : (426 / 565);
+        const cardH = radius * 2.1;
+        const cardW = cardH * aspect;
+        const rx = cx - cardW / 2;
+        const ry = cy - cardH / 2;
+
+        // Subtle glow & card backing
+        ctx.save();
+        ctx.shadowColor = theme.accentGlow || "rgba(245, 158, 11, 0.35)";
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, 6);
+        } else {
+          ctx.rect(rx - 2, ry - 2, cardW + 4, cardH + 4);
+        }
+        ctx.fill();
+        ctx.restore();
+
+        // Draw the exact unedited logo with its original radiant background and border
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(rx, ry, cardW, cardH, 5);
+        } else {
+          ctx.rect(rx, ry, cardW, cardH);
+        }
         ctx.clip();
-        const drawSize = radius * 1.7;
-        ctx.drawImage(img, cx - drawSize / 2, cy - drawSize / 2, drawSize, drawSize);
+        ctx.drawImage(img, rx, ry, cardW, cardH);
         ctx.restore();
+
+        // Elegant gold outer border matching theme
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = theme.gold;
+        ctx.beginPath();
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(rx - 2, ry - 2, cardW + 4, cardH + 4, 6);
+        } else {
+          ctx.rect(rx - 2, ry - 2, cardW + 4, cardH + 4);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+        return;
       } catch (err) {
         useFallbackLogo = true;
         drawVectorEmblemFallback(cx, cy, theme, radius);

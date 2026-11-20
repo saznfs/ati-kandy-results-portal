@@ -1,18 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <defs>
+    <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="65%" stop-color="#fff2c2"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </radialGradient>
     <filter id="badgeShadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity="0.15"/>
     </filter>
   </defs>
-  <!-- Clean white circular disc with gold border -->
-  <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#f59e0b" stroke-width="2.5" filter="url(#badgeShadow)"/>
+  <!-- Rounded rectangle plaque matching user's official SLIATE logo plaque -->
+  <rect x="5" y="2" width="54" height="60" rx="4" fill="url(#goldGlow)" stroke="#f59e0b" stroke-width="2.5" filter="url(#badgeShadow)"/>
   <!-- Official SLIATE Interlocking Diamonds -->
   <g fill="none" stroke="#21155E" stroke-width="2.8" stroke-linejoin="miter">
     <!-- Left Diamond -->
-    <polygon points="26,12 38,26 26,40 14,26"/>
+    <polygon points="26,13 38,27 26,41 14,27"/>
     <!-- Right Diamond -->
-    <polygon points="38,12 50,26 38,40 26,26"/>
+    <polygon points="38,13 50,27 38,41 26,27"/>
   </g>
   <!-- SLIATE Serif Text matching official logo -->
-  <text x="32" y="51" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="9" font-weight="bold" fill="#21155E" letter-spacing="1.2">SLIATE</text>
+  <text x="32" y="52" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="9" font-weight="bold" fill="#21155E" letter-spacing="1.2">SLIATE</text>
 </svg>

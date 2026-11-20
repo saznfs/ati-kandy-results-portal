@@ -87,11 +87,15 @@ const PortalPdfGenerator = (() => {
 
     y = 18;
 
-    // Academic Logo Emblem
+    // Academic Logo Emblem (Preserving exact aspect ratio of the official SLIATE crest)
     const logoImg = document.getElementById("siteLogo");
     if (logoImg && logoImg.complete && logoImg.naturalWidth > 0) {
       try {
-        doc.addImage(logoImg, "PNG", margin + 2, 14, 15, 15);
+        const imgW = logoImg.naturalWidth || 426;
+        const imgH = logoImg.naturalHeight || 565;
+        const targetH = 16;
+        const targetW = targetH * (imgW / imgH); // ~12.07mm
+        doc.addImage(logoImg, "PNG", margin + 2, 13.5, targetW, targetH);
       } catch (e) {
         // Fallback gracefully if CORS prevents direct canvas read
       }
