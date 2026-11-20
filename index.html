@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>SLIATE KANDY - Results Portal</title>
-  <meta name="description" content="SLIATE Kandy Results Portal. View examination results, download PDF statements, and create share cards.">
+  <meta name="description"
+    content="SLIATE Kandy Results Portal. View examination results, download PDF statements, and create share cards.">
   <meta name="theme-color" content="#0f2b5c">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="SLIATE KANDY Results Portal">
-  <meta property="og:description" content="View examination results, calculate GPA, download PDF records, and create social media share cards.">
+  <meta property="og:description"
+    content="View examination results, calculate GPA, download PDF records, and create social media share cards.">
   <meta property="og:image" content="assets/images/sliate-logo.png">
 
   <!-- Twitter Card -->
@@ -30,7 +33,8 @@
 
   <!-- External Libraries: jsPDF, AutoTable, Canvas Confetti -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
+    defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js" defer></script>
 
   <!-- Modular Application Scripts -->
@@ -42,13 +46,15 @@
   <script src="js/socialCardGenerator.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
+
 <body>
   <!-- Header & Navigation -->
   <header class="site-header" role="banner">
     <div class="container header-container">
       <a href="index.html" class="brand-link" aria-label="SLIATE Kandy Results Portal Home">
         <div class="brand-logo-wrapper">
-          <img id="siteLogo" src="assets/images/sliate-logo.png" alt="SLIATE Logo" class="brand-logo" width="44" height="44">
+          <img id="siteLogo" src="assets/images/sliate-logo.png" alt="SLIATE Logo" class="brand-logo" width="44"
+            height="44">
         </div>
         <div class="brand-info">
           <div class="brand-title">
@@ -60,7 +66,8 @@
 
       <div class="header-actions">
         <!-- Theme Toggle Button -->
-        <button id="themeToggleBtn" class="btn-theme-toggle" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">
+        <button id="themeToggleBtn" class="btn-theme-toggle" type="button" aria-label="Toggle dark/light theme"
+          title="Toggle theme">
           <!-- Sun Icon (Dark Mode Active) -->
           <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="5"></circle>
@@ -89,7 +96,8 @@
       <div class="container">
         <h1 id="heroTitle" class="hero-title">SLIATE KANDY</h1>
         <p class="hero-desc">
-          Search your examination results by Index Number, download a PDF result statement, and generate share cards for Instagram, WhatsApp, and LinkedIn.
+          Search your examination results by Index Number, download a PDF result statement, and generate share cards for
+          Instagram, WhatsApp, and LinkedIn.
         </p>
 
         <!-- Search Form Card -->
@@ -97,24 +105,18 @@
           <form id="searchForm" role="search" aria-label="Student Index Search">
             <div class="search-input-group">
               <div class="search-icon-wrapper" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
               </div>
 
-              <input
-                type="text"
-                id="indexInput"
-                class="search-input"
-                placeholder="e.g. KAN/IT/2324/F/xxx"
-                autocomplete="off"
-                spellcheck="false"
-                required
-                aria-label="Enter your Student Index Number"
-              >
+              <input type="text" id="indexInput" class="search-input" placeholder="e.g. KAN/IT/2324/F/xxx"
+                autocomplete="off" spellcheck="false" required aria-label="Enter your Student Index Number">
 
-              <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input" title="Clear input">
+              <button type="button" id="searchClearBtn" class="search-clear-btn" aria-label="Clear search input"
+                title="Clear input">
                 ✕
               </button>
 
@@ -145,11 +147,13 @@
   </main>
 
   <!-- Social Share Card Generator Modal -->
-  <div id="socialModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+  <div id="socialModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
+    aria-hidden="true">
     <div class="modal-card">
       <div class="modal-header">
         <h2 id="modalTitle" class="modal-title">✨ Create Social Share Card</h2>
-        <button type="button" id="modalCloseBtn" class="modal-close-btn" aria-label="Close modal" title="Close modal">✕</button>
+        <button type="button" id="modalCloseBtn" class="modal-close-btn" aria-label="Close modal"
+          title="Close modal">✕</button>
       </div>
 
       <div class="modal-body">
@@ -219,4 +223,5 @@
     </div>
   </footer>
 </body>
+
 </html>
