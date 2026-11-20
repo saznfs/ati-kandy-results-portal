@@ -154,14 +154,14 @@ const PortalUI = (() => {
       ),
 
       // Standing Badge Row
-      el("div", { style: { display: "flex", justifyContent: "center", marginTop: "14px" } },
+      el("div", { class: "standing-badge-wrapper" },
         el("span", { class: `standing-badge ${honours.badgeClass}` }, honours.title)
       )
     );
   }
 
   /**
-   * Action buttons (PDF download, Social Card, Copy summary)
+   * Action buttons (PDF download, Social Card, Copy summary) and honours toggle
    */
   function renderActionToolbar(student) {
     const pdfBtn = el("button", {
@@ -192,10 +192,24 @@ const PortalUI = (() => {
       " Copy Result Summary"
     );
 
-    return el("div", { class: "action-toolbar" },
-      pdfBtn,
-      socialBtn,
-      copyBtn
+    const honoursToggle = el("div", { class: "honours-toggle-bar" },
+      el("label", { class: "honours-toggle-container", for: "chkIncludeHonours" },
+        el("input", {
+          type: "checkbox",
+          id: "chkIncludeHonours",
+          checked: true
+        }),
+        el("span", { class: "toggle-label-text" }, "Show Academic Honours (in PDF & Image Share)")
+      )
+    );
+
+    return el("div", { style: { marginBottom: "var(--space-6)" } },
+      el("div", { class: "action-toolbar", style: { marginBottom: "0" } },
+        pdfBtn,
+        socialBtn,
+        copyBtn
+      ),
+      honoursToggle
     );
   }
 

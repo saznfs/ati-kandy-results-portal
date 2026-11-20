@@ -40,7 +40,7 @@ const PortalPdfGenerator = (() => {
   /**
    * Generates and downloads the A4 PDF Certificate for a student
    */
-  async function generateCertificate(student) {
+  async function generateCertificate(student, options = {}) {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert("PDF generation library is still loading. Please try again in a moment.");
       return;
@@ -296,15 +296,17 @@ const PortalPdfGenerator = (() => {
     });
 
     // --- 4. Overall Academic Standing & Semester GPAs Box ---
-    // Ensure sufficient room for summary box (requires ~34mm)
-    if ((pageHeight - 22 - y) < 34) {
+    const showHonours = options.showHonours !== false;
+    const boxHeight = showHonours ? 31 : 22;
+    const neededSpace = boxHeight + 4;
+
+    if ((pageHeight - 22 - y) < neededSpace) {
       doc.addPage();
       drawPageBackground(doc);
       y = 22;
     }
 
     const boxWidth = pageWidth - (margin * 2);
-    const boxHeight = 31;
     const honours = PortalUI.getHonoursClassification(student.cgpa);
     const sems = student.semesters || [];
 
@@ -350,22 +352,24 @@ const PortalPdfGenerator = (() => {
       doc.text(Number(s.sgpa || 0).toFixed(2), cardX + (cardWidth / 2), cardY + 9.8, { align: "center" });
     });
 
-    // Divider Line inside Summary Box
-    const honoursY = y + 21.5;
-    doc.setDrawColor(226, 232, 240);
-    doc.setLineWidth(0.3);
-    doc.line(margin + 6, honoursY, margin + boxWidth - 6, honoursY);
+    if (showHonours) {
+      // Divider Line inside Summary Box
+      const honoursY = y + 21.5;
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.3);
+      doc.line(margin + 6, honoursY, margin + boxWidth - 6, honoursY);
 
-    // Honours Classification Row (Distinct, high-contrast, zero overlap)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(71, 85, 105);
-    doc.text("ACADEMIC HONOURS:", margin + 8, honoursY + 6.2);
+      // Honours Classification Row (Distinct, high-contrast, zero overlap)
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text("ACADEMIC HONOURS:", margin + 8, honoursY + 6.2);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10.5);
-    doc.setTextColor(217, 119, 6); // Academic Gold
-    doc.text(`★  ${honours.title.toUpperCase()}  ★`, margin + 54, honoursY + 6.2);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(217, 119, 6); // Academic Gold
+      doc.text(`★  ${honours.title.toUpperCase()}  ★`, margin + 54, honoursY + 6.2);
+    }
 
     y += boxHeight + 4;
 

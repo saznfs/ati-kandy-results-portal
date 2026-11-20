@@ -22,7 +22,8 @@ const PortalSocialCardGenerator = (() => {
 
   const currentOptions = {
     aspectRatio: "9:16", // "9:16" or "1:1"
-    theme: "navy"        // "navy", "emerald", "onyx", "crimson"
+    theme: "navy",        // "navy", "emerald", "onyx", "crimson"
+    showHonours: true    // true or false
   };
 
   const THEMES = {
@@ -243,30 +244,42 @@ const PortalSocialCardGenerator = (() => {
       theme.textPrimary
     );
 
-    // 3. Honours Classification Banner
-    const honours = PortalUI.getHonoursClassification(student.cgpa);
-    const bannerW = 640;
-    const bannerH = 50;
-    const bannerY = 340;
-    drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 25, theme, true);
+    // 3. Honours Classification Banner (Conditional)
+    const showHonours = currentOptions.showHonours !== false;
+    let gridTitleY = 426;
+    let gridY = 452;
+    let rowH = 195;
 
-    drawFittedText(
-      `★  ${honours.title.toUpperCase()}  ★`,
-      width / 2,
-      bannerY + 33,
-      22,
-      1.5,
-      bannerW - 30,
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      "900",
-      theme.gold
-    );
+    if (showHonours) {
+      const honours = PortalUI.getHonoursClassification(student.cgpa);
+      const bannerW = 640;
+      const bannerH = 50;
+      const bannerY = 340;
+      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 25, theme, true);
+
+      drawFittedText(
+        `★  ${honours.title.toUpperCase()}  ★`,
+        width / 2,
+        bannerY + 33,
+        22,
+        1.5,
+        bannerW - 30,
+        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "900",
+        theme.gold
+      );
+    } else {
+      // Re-balance grid coordinates when honours banner is hidden
+      gridTitleY = 356;
+      gridY = 390;
+      rowH = 226;
+    }
 
     // 4. All Semester GPAs Showcase (2x2 Grid)
     drawFittedText(
       "ACADEMIC SEMESTER GPA",
       width / 2,
-      426,
+      gridTitleY,
       20,
       3,
       maxContentWidth,
@@ -277,9 +290,7 @@ const PortalSocialCardGenerator = (() => {
 
     const sems = student.semesters || [];
     const gridX = 60;
-    const gridY = 452;
     const colW = (cardWidth - 24) / 2; // 468px
-    const rowH = 195;
 
     for (let i = 0; i < 4; i++) {
       const col = i % 2;
@@ -297,7 +308,7 @@ const PortalSocialCardGenerator = (() => {
       drawFittedText(
         semLabel,
         cx + colW / 2,
-        cy + 42,
+        cy + (showHonours ? 42 : 48),
         22,
         1,
         colW - 30,
@@ -311,21 +322,21 @@ const PortalSocialCardGenerator = (() => {
       ctx.strokeStyle = theme.cardBorder;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(cx + 35, cy + 58);
-      ctx.lineTo(cx + colW - 35, cy + 58);
+      ctx.moveTo(cx + 35, cy + (showHonours ? 58 : 66));
+      ctx.lineTo(cx + colW - 35, cy + (showHonours ? 58 : 66));
       ctx.stroke();
       ctx.restore();
 
       // Large GPA value (Huge & bold)
       ctx.textAlign = "center";
       ctx.fillStyle = theme.gold;
-      ctx.font = "900 68px 'Courier New', monospace";
-      ctx.fillText(semGpa, cx + colW / 2, cy + 130);
+      ctx.font = `900 ${showHonours ? "68px" : "74px"} 'Courier New', monospace`;
+      ctx.fillText(semGpa, cx + colW / 2, cy + (showHonours ? 130 : 148));
 
       // Semester GPA Label
       ctx.fillStyle = theme.textSecondary;
       ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + 164);
+      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + (showHonours ? 164 : 190));
     }
 
     // 5. Milestone Pill
@@ -431,30 +442,44 @@ const PortalSocialCardGenerator = (() => {
       theme.textPrimary
     );
 
-    // 3. Honours Banner
-    const honours = PortalUI.getHonoursClassification(student.cgpa);
-    const bannerW = 660;
-    const bannerH = 58;
-    const bannerY = 470;
-    drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 29, theme, true);
+    // 3. Honours Banner (Conditional)
+    const showHonours = currentOptions.showHonours !== false;
+    let sectionTitleY = 575;
+    let yStart = 615;
+    let semCardH = 160;
+    let semGap = 26;
 
-    drawFittedText(
-      `★  ${honours.title.toUpperCase()}  ★`,
-      width / 2,
-      bannerY + 38,
-      24,
-      2,
-      bannerW - 30,
-      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      "900",
-      theme.gold
-    );
+    if (showHonours) {
+      const honours = PortalUI.getHonoursClassification(student.cgpa);
+      const bannerW = 660;
+      const bannerH = 58;
+      const bannerY = 470;
+      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 29, theme, true);
+
+      drawFittedText(
+        `★  ${honours.title.toUpperCase()}  ★`,
+        width / 2,
+        bannerY + 38,
+        24,
+        2,
+        bannerW - 30,
+        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "900",
+        theme.gold
+      );
+    } else {
+      // Re-balance vertical rhythm when honours banner is hidden
+      sectionTitleY = 480;
+      yStart = 520;
+      semCardH = 180;
+      semGap = 28;
+    }
 
     // 4. All Semester GPAs Section Title
     drawFittedText(
       "SEMESTER GPA PROGRESSION",
       width / 2,
-      575,
+      sectionTitleY,
       22,
       3,
       maxContentWidth,
@@ -465,9 +490,6 @@ const PortalSocialCardGenerator = (() => {
 
     // 5. Four Stacked Full-Width Semester Cards
     const sems = student.semesters || [];
-    const semCardH = 160;
-    const semGap = 26;
-    const yStart = 615;
 
     for (let i = 0; i < 4; i++) {
       const cardY = yStart + i * (semCardH + semGap);
@@ -483,7 +505,7 @@ const PortalSocialCardGenerator = (() => {
       drawFittedText(
         semTitle,
         cardMargin + 35,
-        cardY + 62,
+        cardY + (showHonours ? 62 : 68),
         28,
         0,
         cardWidth - 280,
@@ -495,17 +517,17 @@ const PortalSocialCardGenerator = (() => {
 
       ctx.fillStyle = theme.accent;
       ctx.font = "bold 16px 'Courier New', monospace";
-      ctx.fillText(`${semCode} • ACADEMIC RECORD`, cardMargin + 35, cardY + 106);
+      ctx.fillText(`${semCode} • ACADEMIC RECORD`, cardMargin + 35, cardY + (showHonours ? 106 : 116));
 
       // Right: Large GPA and SGPA label
       ctx.textAlign = "right";
       ctx.fillStyle = theme.gold;
-      ctx.font = "900 64px 'Courier New', monospace";
-      ctx.fillText(semGpa, cardMargin + cardWidth - 35, cardY + 76);
+      ctx.font = `900 ${showHonours ? "64px" : "70px"} 'Courier New', monospace`;
+      ctx.fillText(semGpa, cardMargin + cardWidth - 35, cardY + (showHonours ? 76 : 84));
 
       ctx.fillStyle = theme.textSecondary;
       ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillText("SEMESTER GPA", cardMargin + cardWidth - 35, cardY + 112);
+      ctx.fillText("SEMESTER GPA", cardMargin + cardWidth - 35, cardY + (showHonours ? 112 : 124));
     }
 
     // 6. Milestone Pill

@@ -167,10 +167,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function bindResultActionButtons() {
     const pdfBtn = document.getElementById("btnDownloadPdf");
     const socialBtn = document.getElementById("btnOpenSocialModal");
+    const chkMainHonours = document.getElementById("chkIncludeHonours");
+
+    if (chkMainHonours) {
+      chkMainHonours.addEventListener("change", () => {
+        const isChecked = chkMainHonours.checked;
+        const standingBadge = document.querySelector(".standing-badge-wrapper");
+        if (standingBadge) {
+          standingBadge.style.display = isChecked ? "flex" : "none";
+        }
+        const chkModal = document.getElementById("chkModalHonours");
+        if (chkModal) chkModal.checked = isChecked;
+      });
+    }
 
     if (pdfBtn && currentStudentData) {
       pdfBtn.addEventListener("click", () => {
-        PortalPdfGenerator.generateCertificate(currentStudentData);
+        const chk = document.getElementById("chkIncludeHonours");
+        const showHonours = chk ? chk.checked : true;
+        PortalPdfGenerator.generateCertificate(currentStudentData, { showHonours });
       });
     }
 
@@ -188,8 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
     socialModal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden"; // lock scroll
 
+    const chkMain = document.getElementById("chkIncludeHonours");
+    const showHonours = chkMain ? chkMain.checked : true;
+    const chkModal = document.getElementById("chkModalHonours");
+    if (chkModal) chkModal.checked = showHonours;
+
     // Render initial canvas
-    PortalSocialCardGenerator.render(currentStudentData);
+    PortalSocialCardGenerator.render(currentStudentData, { showHonours });
   }
 
   function closeSocialModal() {
@@ -238,6 +258,23 @@ document.addEventListener("DOMContentLoaded", () => {
       PortalSocialCardGenerator.render(currentStudentData, { theme: themeChoice });
     });
   });
+
+  // Honours Toggle inside Modal
+  const chkModalHonours = document.getElementById("chkModalHonours");
+  if (chkModalHonours) {
+    chkModalHonours.addEventListener("change", () => {
+      const showHonours = chkModalHonours.checked;
+      const chkMain = document.getElementById("chkIncludeHonours");
+      if (chkMain) {
+        chkMain.checked = showHonours;
+        const standingBadge = document.querySelector(".standing-badge-wrapper");
+        if (standingBadge) {
+          standingBadge.style.display = showHonours ? "flex" : "none";
+        }
+      }
+      PortalSocialCardGenerator.render(currentStudentData, { showHonours });
+    });
+  }
 
 
 
