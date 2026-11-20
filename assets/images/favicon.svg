@@ -7,12 +7,12 @@
   <!-- Clean white circular disc with gold border -->
   <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#f59e0b" stroke-width="2.5" filter="url(#badgeShadow)"/>
   <!-- Official SLIATE Interlocking Diamonds -->
-  <g fill="none" stroke="#28166F" stroke-width="2.6" stroke-linejoin="miter">
+  <g fill="none" stroke="#21155E" stroke-width="2.8" stroke-linejoin="miter">
     <!-- Left Diamond -->
     <polygon points="26,12 38,26 26,40 14,26"/>
     <!-- Right Diamond -->
     <polygon points="38,12 50,26 38,40 26,26"/>
   </g>
-  <!-- SLIATE Text -->
-  <text x="32" y="50" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="8" font-weight="900" fill="#28166F" letter-spacing="1">SLIATE</text>
+  <!-- SLIATE Serif Text matching official logo -->
+  <text x="32" y="51" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="9" font-weight="bold" fill="#21155E" letter-spacing="1.2">SLIATE</text>
 </svg>
