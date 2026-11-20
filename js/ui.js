@@ -220,7 +220,7 @@ const PortalUI = (() => {
   }
 
   /**
-   * Multi-Semester Navigation & Tables
+   * Multi-Semester Navigation & Tables (Accessible WAI-ARIA Tabs)
    */
   function renderSemesterSection(student) {
     const semesters = student.semesters || [];
@@ -233,10 +233,13 @@ const PortalUI = (() => {
     // "All Semesters" Tab
     const allTabBtn = el("button", {
       type: "button",
+      id: "tab-btn-all",
       class: "tab-btn active",
       role: "tab",
       "aria-selected": "true",
-      dataset: { tabTarget: "tab-all" }
+      "aria-controls": "panel-all",
+      tabindex: "0",
+      dataset: { tabTarget: "panel-all" }
     }, "All Semesters Overview");
 
     nav.appendChild(allTabBtn);
@@ -245,16 +248,25 @@ const PortalUI = (() => {
     semesters.forEach((sem, idx) => {
       const semTabBtn = el("button", {
         type: "button",
+        id: `tab-btn-sem-${idx}`,
         class: "tab-btn",
         role: "tab",
         "aria-selected": "false",
-        dataset: { tabTarget: `tab-sem-${idx}` }
+        "aria-controls": `panel-sem-${idx}`,
+        tabindex: "-1",
+        dataset: { tabTarget: `panel-sem-${idx}` }
       }, sem.semesterTitle || `Year ${sem.year} Sem ${sem.semester}`);
       nav.appendChild(semTabBtn);
     });
 
     // Panel 1: All Semesters
-    const allPanel = el("div", { class: "semester-panel active", id: "tab-all", role: "tabpanel" });
+    const allPanel = el("div", {
+      class: "semester-panel active",
+      id: "panel-all",
+      role: "tabpanel",
+      "aria-labelledby": "tab-btn-all",
+      tabindex: "0"
+    });
     semesters.forEach(sem => {
       allPanel.appendChild(renderSingleSemesterBlock(sem));
     });
@@ -262,22 +274,27 @@ const PortalUI = (() => {
 
     // Panels for individual semesters
     semesters.forEach((sem, idx) => {
-      const singlePanel = el("div", { class: "semester-panel", id: `tab-sem-${idx}`, role: "tabpanel" });
+      const singlePanel = el("div", {
+        class: "semester-panel",
+        id: `panel-sem-${idx}`,
+        role: "tabpanel",
+        "aria-labelledby": `tab-btn-sem-${idx}`,
+        tabindex: "0"
+      });
       singlePanel.appendChild(renderSingleSemesterBlock(sem));
       panelsContainer.appendChild(singlePanel);
     });
 
-    // Tab switching event delegation
-    nav.addEventListener("click", (e) => {
-      const btn = e.target.closest(".tab-btn");
+    function activateTab(btn) {
       if (!btn) return;
-
       nav.querySelectorAll(".tab-btn").forEach(b => {
         b.classList.remove("active");
         b.setAttribute("aria-selected", "false");
+        b.setAttribute("tabindex", "-1");
       });
       btn.classList.add("active");
       btn.setAttribute("aria-selected", "true");
+      btn.setAttribute("tabindex", "0");
 
       const targetId = btn.dataset.tabTarget;
       panelsContainer.querySelectorAll(".semester-panel").forEach(p => {
@@ -287,6 +304,39 @@ const PortalUI = (() => {
       const activePanel = document.getElementById(targetId);
       if (activePanel) {
         activePanel.classList.add("active");
+      }
+    }
+
+    // Tab switching click event delegation
+    nav.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab-btn");
+      if (btn) activateTab(btn);
+    });
+
+    // WAI-ARIA Keyboard navigation: ArrowLeft, ArrowRight, Home, End
+    nav.addEventListener("keydown", (e) => {
+      const tabs = Array.from(nav.querySelectorAll('.tab-btn[role="tab"]'));
+      const activeIdx = tabs.indexOf(document.activeElement);
+      if (activeIdx === -1) return;
+
+      let nextIdx = activeIdx;
+      if (e.key === "ArrowRight") {
+        nextIdx = (activeIdx + 1) % tabs.length;
+        e.preventDefault();
+      } else if (e.key === "ArrowLeft") {
+        nextIdx = (activeIdx - 1 + tabs.length) % tabs.length;
+        e.preventDefault();
+      } else if (e.key === "Home") {
+        nextIdx = 0;
+        e.preventDefault();
+      } else if (e.key === "End") {
+        nextIdx = tabs.length - 1;
+        e.preventDefault();
+      }
+
+      if (nextIdx !== activeIdx) {
+        tabs[nextIdx].focus();
+        activateTab(tabs[nextIdx]);
       }
     });
 

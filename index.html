@@ -12,6 +12,9 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://saznfs.github.io/ati-kandy-results-portal/">
 
+  <!-- Security & Content Security Policy (Strict Self-Hosted CSP) -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self';">
+
   <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SLIATE KANDY">
@@ -45,11 +48,10 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/mobile.css">
 
-  <!-- External Libraries: jsPDF, AutoTable, Canvas Confetti -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
-    defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js" defer></script>
+  <!-- Self-Hosted Vendor Libraries: jsPDF, AutoTable, Canvas Confetti -->
+  <script src="assets/vendor/jspdf.umd.min.js" defer></script>
+  <script src="assets/vendor/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="assets/vendor/confetti.browser.min.js" defer></script>
 
   <!-- Modular Application Scripts -->
   <script src="js/config.js" defer></script>
@@ -399,7 +401,7 @@
             </li>
             <li>
               <span class="contact-label">Grading:</span>
-              <a id="btnFooterGradingScheme" href="javascript:void(0);">SLIATE Grading System (5.9 &amp; 5.10)</a>
+              <a id="btnFooterGradingScheme" href="#" role="button">SLIATE Grading System (5.9 &amp; 5.10)</a>
             </li>
           </ul>
         </div>

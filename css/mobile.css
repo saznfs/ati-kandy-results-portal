@@ -202,3 +202,16 @@
     display: none; /* Keep header minimal on ultra small screens */
   }
 }
+
+/* Accessibility: Enforce minimum 44x44px touch targets across all mobile viewports */
+.btn-theme-toggle,
+.modal-close-btn,
+#themeToggleBtn,
+#modalCloseBtn,
+#gradingModalCloseBtn {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

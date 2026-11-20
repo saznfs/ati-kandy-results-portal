@@ -3,7 +3,8 @@
 # ==========================================
 
 # STRICT PRIVACY: NEVER commit raw student grades or spreadsheet files!
-data/raw/
+data/raw/*
+!data/raw/sample_*.json
 *.csv
 *.tsv
 *.xlsx

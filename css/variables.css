@@ -90,6 +90,7 @@
   --text-main: var(--color-slate-900);
   --text-secondary: var(--color-slate-600);
   --text-muted: var(--color-slate-500);
+  --color-text-muted: var(--color-slate-500);
   --text-inverse: var(--color-white);
 
   --brand-primary: var(--color-navy-800);
@@ -129,6 +130,7 @@
   --text-main: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
+  --color-text-muted: #94a3b8;
   --text-inverse: #071120;
 
   --brand-primary: #3b82f6;

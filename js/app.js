@@ -64,22 +64,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 5. Input Auto-Formatting & Clear Button
+  function syncClearButton() {
+    if (searchClearBtn && indexInput) {
+      searchClearBtn.style.display = indexInput.value.trim().length > 0 ? "block" : "none";
+    }
+  }
+
+  // Sync on initial DOMContentLoaded and pageshow (for bfcache / autofill restoration)
+  syncClearButton();
+  window.addEventListener("pageshow", syncClearButton);
+
   if (indexInput) {
     indexInput.addEventListener("input", () => {
       // Auto uppercase & trim spaces
       const val = indexInput.value.toUpperCase();
       indexInput.value = val;
-
-      if (searchClearBtn) {
-        searchClearBtn.style.display = val.length > 0 ? "block" : "none";
-      }
+      syncClearButton();
     });
 
     if (searchClearBtn) {
       searchClearBtn.addEventListener("click", () => {
         indexInput.value = "";
-        searchClearBtn.style.display = "none";
+        syncClearButton();
         PortalUI.clearResults();
+        currentStudentData = null;
+        window.history.replaceState({}, "", window.location.pathname);
         indexInput.focus();
       });
     }
@@ -96,7 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 8. Core Search Flow
   async function performSearch(rawIndex) {
-    // A. Validate input
+    // A. Offline network pre-check
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      PortalUI.showError("You appear to be offline. Please check your internet connection and try again.", true);
+      return;
+    }
+
+    // B. Validate input
     const validation = PortalSecurity.validateIndex(rawIndex);
     if (!validation.isValid) {
       PortalUI.showError(validation.error);
@@ -105,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const normalizedIndex = validation.normalized;
 
-    // B. Check anti-abuse rate limit
+    // C. Check anti-abuse rate limit
     const rateCheck = PortalSecurity.checkRateLimit();
     if (!rateCheck.allowed) {
       PortalUI.showError(
@@ -115,15 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // C. Set Loading State
+    // D. Set Loading State
     PortalUI.setLoading(true);
 
     try {
-      // D. Compute SHA-256 hash for encrypted file lookup
+      // E. Compute SHA-256 hash for encrypted file lookup
       const fileHash = await PortalCrypto.computeIndexHash(normalizedIndex);
       const fileUrl = `data/encrypted/${fileHash}.json`;
 
-      // E. Fetch the encrypted JSON blob
+      // F. Fetch the encrypted JSON blob
       const response = await fetch(fileUrl, { cache: "no-store" });
       if (!response.ok) {
         if (response.status === 404) {
@@ -139,25 +154,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const encryptedBlob = await response.json();
 
-      // F. Decrypt the record client-side with AES-256-GCM
+      // G. Decrypt the record client-side with AES-256-GCM
       const studentData = await PortalCrypto.decryptStudentData(encryptedBlob, normalizedIndex);
 
-      // G. Render Result View
+      // H. Render Result View
       currentStudentData = studentData;
       PortalSecurity.clearRateLimitCooldown();
       PortalUI.renderResults(studentData);
 
-      // H. Bind Action Buttons inside the rendered view
+      // I. Bind Action Buttons inside the rendered view
       bindResultActionButtons();
 
-      // I. Update URL search query without reload
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set("index", normalizedIndex);
-      window.history.replaceState({}, "", newUrl.toString());
+      // J. Update URL search query cleanly without reload or carrying leftover params
+      const cleanUrl = `${window.location.pathname}?index=${encodeURIComponent(normalizedIndex)}`;
+      window.history.replaceState({}, "", cleanUrl);
 
     } catch (err) {
       console.error("Search error:", err);
-      PortalUI.showError(err.message || "An unexpected error occurred while processing the result.");
+      if (err instanceof TypeError || (err.message && err.message.toLowerCase().includes("failed to fetch"))) {
+        PortalUI.showError("Network connection error. Unable to retrieve result data. Please check your internet connection.", true);
+      } else {
+        PortalUI.showError(err.message || "An unexpected error occurred while processing the result.");
+      }
     } finally {
       PortalUI.setLoading(false);
     }

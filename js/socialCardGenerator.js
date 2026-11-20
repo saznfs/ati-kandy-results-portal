@@ -10,8 +10,10 @@ const PortalSocialCardGenerator = (() => {
   let ctx = null;
   let currentStudent = null;
   let logoImg = null;
+  let useFallbackLogo = false;
 
   function getLogoImage() {
+    if (useFallbackLogo) return null;
     if (!logoImg) {
       logoImg = new Image();
       logoImg.crossOrigin = "anonymous";
@@ -618,6 +620,33 @@ const PortalSocialCardGenerator = (() => {
   }
 
   /**
+   * Helper: Draw vector cap emblem fallback when image logo is unavailable or tainted
+   */
+  function drawVectorEmblemFallback(cx, cy, theme, radius = 30) {
+    const scale = radius / 30;
+
+    // Fallback Cap icon inside badge
+    ctx.fillStyle = theme.gold;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 13 * scale);
+    ctx.lineTo(cx + 18 * scale, cy - 3 * scale);
+    ctx.lineTo(cx, cy + 7 * scale);
+    ctx.lineTo(cx - 18 * scale, cy - 3 * scale);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#2c1c73";
+    ctx.beginPath();
+    ctx.moveTo(cx - 11 * scale, cy);
+    ctx.lineTo(cx - 11 * scale, cy + 8 * scale);
+    ctx.quadraticCurveTo(cx, cy + 14 * scale, cx + 11 * scale, cy + 8 * scale);
+    ctx.lineTo(cx + 11 * scale, cy);
+    ctx.lineTo(cx, cy + 5 * scale);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  /**
    * Helper: Draw top academic emblem badge with official SLIATE logo
    */
   function drawEmblemBadge(cx, cy, theme, radius = 30) {
@@ -631,47 +660,49 @@ const PortalSocialCardGenerator = (() => {
     ctx.stroke();
 
     const img = getLogoImage();
-    if (img && img.complete && img.naturalWidth > 0) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
-      ctx.clip();
-      const drawSize = radius * 1.7;
-      ctx.drawImage(img, cx - drawSize / 2, cy - drawSize / 2, drawSize, drawSize);
-      ctx.restore();
+    if (!useFallbackLogo && img && img.complete && img.naturalWidth > 0) {
+      try {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
+        ctx.clip();
+        const drawSize = radius * 1.7;
+        ctx.drawImage(img, cx - drawSize / 2, cy - drawSize / 2, drawSize, drawSize);
+        ctx.restore();
+      } catch (err) {
+        useFallbackLogo = true;
+        drawVectorEmblemFallback(cx, cy, theme, radius);
+      }
     } else {
-      const scale = radius / 30;
-
-      // Fallback Cap icon inside badge
-      ctx.fillStyle = theme.gold;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - 13 * scale);
-      ctx.lineTo(cx + 18 * scale, cy - 3 * scale);
-      ctx.lineTo(cx, cy + 7 * scale);
-      ctx.lineTo(cx - 18 * scale, cy - 3 * scale);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.fillStyle = "#2c1c73";
-      ctx.beginPath();
-      ctx.moveTo(cx - 11 * scale, cy);
-      ctx.lineTo(cx - 11 * scale, cy + 8 * scale);
-      ctx.quadraticCurveTo(cx, cy + 14 * scale, cx + 11 * scale, cy + 8 * scale);
-      ctx.lineTo(cx + 11 * scale, cy);
-      ctx.lineTo(cx, cy + 5 * scale);
-      ctx.closePath();
-      ctx.fill();
+      drawVectorEmblemFallback(cx, cy, theme, radius);
     }
     ctx.restore();
   }
 
   /**
-   * Triggers download of generated card PNG
+   * Triggers download of generated card PNG with CORS/tainted fallback protection
    */
   async function downloadCard() {
     if (!canvas) return;
 
-    const dataUrl = canvas.toDataURL("image/png", 1.0);
+    let dataUrl;
+    try {
+      dataUrl = canvas.toDataURL("image/png", 1.0);
+    } catch (err) {
+      console.warn("Canvas toDataURL failed (likely tainted). Retrying with clean vector emblem fallback...", err);
+      useFallbackLogo = true;
+      render();
+      try {
+        dataUrl = canvas.toDataURL("image/png", 1.0);
+      } catch (retryErr) {
+        console.error("Canvas export failed on retry:", retryErr);
+        if (typeof PortalUI !== "undefined" && PortalUI.showError) {
+          PortalUI.showError("Unable to export share card due to browser security restrictions.", true);
+        }
+        return;
+      }
+    }
+
     const link = document.createElement("a");
     const namePart = (currentStudent && currentStudent.indexNumber)
       ? currentStudent.indexNumber.replace(/[\/\\]/g, "_")
@@ -713,74 +744,95 @@ const PortalSocialCardGenerator = (() => {
       // fallback
     }
 
-    try {
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          alert("Failed to export card image.");
-          return;
-        }
-
-        const file = new File([blob], fileName, { type: "image/png" });
-
-        // Level 1: Full file sharing via Web Share API (Mobile Chrome / Safari)
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: shareTitle,
-              text: `${shareText}\n${shareUrl}`,
-              url: shareUrl
-            });
-            return;
-          } catch (fileShareErr) {
-            if (fileShareErr.name === "AbortError") return;
-            // Retry sharing file without url parameter if combined payload is rejected
-            try {
-              await navigator.share({
-                files: [file],
-                title: shareTitle,
-                text: `${shareText}\n${shareUrl}`
-              });
-              return;
-            } catch (retryErr) {
-              if (retryErr.name === "AbortError") return;
-            }
-          }
-        }
-
-        // Level 2: Text/URL sharing via Web Share API (Desktop Chrome / Safari / Edge)
-        if (navigator.share) {
-          try {
-            downloadCard();
-            await navigator.share({
-              title: shareTitle,
-              text: shareText,
-              url: shareUrl
-            });
-            return;
-          } catch (urlShareErr) {
-            if (urlShareErr.name === "AbortError") return;
-          }
-        }
-
-        // Level 3: Fallback for browsers without Web Share API (Desktop Firefox / older browsers)
-        downloadCard();
+    function getCanvasBlob() {
+      return new Promise((resolve, reject) => {
         try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-            alert("Card image downloaded and result link copied to clipboard! You can now paste and share it directly.");
-          } else {
-            alert("Card image downloaded so you can share it directly!");
-          }
-        } catch (clipErr) {
-          alert("Card image downloaded so you can share it directly!");
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error("Canvas toBlob returned null"));
+          }, "image/png", 1.0);
+        } catch (err) {
+          reject(err);
         }
-      }, "image/png", 1.0);
+      });
+    }
+
+    let blob;
+    try {
+      blob = await getCanvasBlob();
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Share failed:", err);
+      console.warn("Canvas toBlob failed (likely tainted). Retrying with clean vector emblem fallback...", err);
+      useFallbackLogo = true;
+      render();
+      try {
+        blob = await getCanvasBlob();
+      } catch (retryErr) {
+        console.error("Canvas toBlob retry failed:", retryErr);
         downloadCard();
+        return;
       }
+    }
+
+    const file = new File([blob], fileName, { type: "image/png" });
+
+    // Level 1: Full file sharing via Web Share API (Mobile Chrome / Safari)
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: shareTitle,
+          text: `${shareText}\n${shareUrl}`,
+          url: shareUrl
+        });
+        return;
+      } catch (fileShareErr) {
+        if (fileShareErr.name === "AbortError") return;
+        // Retry sharing file without url parameter if combined payload is rejected
+        try {
+          await navigator.share({
+            files: [file],
+            title: shareTitle,
+            text: `${shareText}\n${shareUrl}`
+          });
+          return;
+        } catch (retryErr) {
+          if (retryErr.name === "AbortError") return;
+        }
+      }
+    }
+
+    // Level 2: Text/URL sharing via Web Share API (Desktop Chrome / Safari / Edge)
+    if (navigator.share) {
+      try {
+        downloadCard();
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl
+        });
+        return;
+      } catch (urlShareErr) {
+        if (urlShareErr.name === "AbortError") return;
+      }
+    }
+
+    // Level 3: Fallback for browsers without Web Share API
+    downloadCard();
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        if (typeof PortalUI !== "undefined" && PortalUI.showError) {
+          PortalUI.showError("Card image downloaded and result link copied to clipboard! You can paste and share it directly.", true);
+        } else {
+          alert("Card image downloaded and result link copied to clipboard!");
+        }
+      } else {
+        if (typeof PortalUI !== "undefined" && PortalUI.showError) {
+          PortalUI.showError("Card image downloaded! You can now share it directly.", true);
+        }
+      }
+    } catch (clipErr) {
+      // Ignored
     }
   }
 

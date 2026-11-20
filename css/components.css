@@ -96,8 +96,10 @@
 
 /* Theme Toggle Button */
 .btn-theme-toggle {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -106,6 +108,7 @@
   border: 1px solid var(--border-color);
   background-color: var(--bg-surface);
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .btn-theme-toggle:hover {
@@ -1057,14 +1060,19 @@
 }
 
 .modal-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
   transition: all var(--transition-fast);
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .modal-close-btn:hover {

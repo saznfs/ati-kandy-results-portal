@@ -38,20 +38,44 @@ const PortalPdfGenerator = (() => {
   }
 
   /**
+   * Checks whether jsPDF and the AutoTable plugin are loaded and ready
+   */
+  function isReady() {
+    return Boolean(
+      window.jspdf &&
+      window.jspdf.jsPDF &&
+      (typeof window.jspdf.jsPDF.API?.autoTable === "function" || typeof jsPDF !== "undefined")
+    );
+  }
+
+  /**
    * Generates and downloads the A4 PDF Certificate for a student
    */
   async function generateCertificate(student, options = {}) {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-      alert("PDF generation library is still loading. Please try again in a moment.");
+    if (!isReady()) {
+      if (typeof PortalUI !== "undefined" && PortalUI.showError) {
+        PortalUI.showError("PDF generation library is still loading or unavailable. Please refresh the page.", true);
+      } else {
+        console.error("PDF generation library unavailable.");
+      }
       return;
     }
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4"
-    });
+    const pdfBtn = document.getElementById("btnDownloadPdf");
+    let originalHtml = "";
+    if (pdfBtn) {
+      pdfBtn.disabled = true;
+      originalHtml = pdfBtn.innerHTML;
+      pdfBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Generating PDF...';
+    }
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -411,9 +435,21 @@ const PortalPdfGenerator = (() => {
     // Save PDF
     const filename = `SLIATE_KANDY_${student.indexNumber.replace(/[\/\\]/g, "_")}.pdf`;
     doc.save(filename);
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    if (typeof PortalUI !== "undefined" && PortalUI.showError) {
+      PortalUI.showError("Failed to generate PDF result statement. Please try again.", true);
+    }
+  } finally {
+    if (pdfBtn) {
+      pdfBtn.disabled = false;
+      pdfBtn.innerHTML = originalHtml;
+    }
   }
+}
 
   return {
+    isReady,
     generateCertificate
   };
 })();
