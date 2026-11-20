@@ -20,8 +20,8 @@ const CONFIG = {
   socialDisclaimer: "SLIATE KANDY",
 
   // Report Issue / Removal Request
-  reportIssueEmail: "sliate.community.portal@gmail.com",
-  reportIssueUrl: "mailto:sliate.community.portal@gmail.com?subject=ATI%20Results%20Portal%20Inquiry%20or%20Result%20Removal%20Request",
+  reportIssueEmail: "sazninfs@gmail.com",
+  reportIssueUrl: "mailto:sazninfs@gmail.com?subject=SLIATE%20Kandy%20Results%20Portal%20-%20Issue%20or%20Result%20Removal%20Request",
 
   // Security & Web Crypto Salt (Matches scripts/build-data.js)
   salt: "SLIATE_ATI_COMMUNITY_KEY_SALT_2026_SECURE",

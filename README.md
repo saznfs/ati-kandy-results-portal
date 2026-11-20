@@ -228,8 +228,8 @@ Open `http://localhost:8000` in your web browser.
 This portal is maintained as an open-source student community initiative. If any student or administration wishes to request correction or removal of an encrypted record, configure your contact email in `js/config.js`:
 
 ```javascript
-reportIssueEmail: "sliate.community.portal@gmail.com",
-reportIssueUrl: "mailto:sliate.community.portal@gmail.com?subject=ATI%20Results%20Portal%20Issue%20or%20Removal%20Request"
+reportIssueEmail: "sazninfs@gmail.com",
+reportIssueUrl: "mailto:sazninfs@gmail.com?subject=SLIATE%20Kandy%20Results%20Portal%20-%20Issue%20or%20Result%20Removal%20Request"
 ```
 
 ---
