@@ -33,7 +33,7 @@ const CONFIG = {
     cooldownMs: 30 * 1000     // 30 seconds lockout after exceeding
   },
 
-  // SLIATE Academic Grading Scale
+  // SLIATE Academic Grading Scale (Section 5.10)
   gradePoints: {
     "A+": 4.00,
     "A":  4.00,
@@ -47,7 +47,50 @@ const CONFIG = {
     "D+": 1.30,
     "D":  1.00,
     "E":  0.00,
-    "NE": 0.00
+    "I(SE)": 0.00,
+    "I(CA)": 0.00,
+    "INC": 0.00,
+    "DFR": 0.00,
+    "AB":  0.00,
+    "NE":  0.00,
+    "*":   0.00
+  },
+
+  // Official Section 5.10: Range of Marks & Grade Points
+  gradingScale: [
+    { range: "85 - 100", grade: "A+", points: 4.00 },
+    { range: "70 - 84",  grade: "A",  points: 4.00 },
+    { range: "65 - 69",  grade: "A-", points: 3.70 },
+    { range: "60 - 64",  grade: "B+", points: 3.30 },
+    { range: "55 - 59",  grade: "B",  points: 3.00 },
+    { range: "50 - 54",  grade: "B-", points: 2.70 },
+    { range: "45 - 49",  grade: "C+", points: 2.30 },
+    { range: "40 - 44",  grade: "C",  points: 2.00 },
+    { range: "35 - 39",  grade: "C-", points: 1.70 },
+    { range: "30 - 34",  grade: "D+", points: 1.30 },
+    { range: "25 - 29",  grade: "D",  points: 1.00 },
+    { range: "0 - 24",   grade: "E",  points: 0.00 }
+  ],
+
+  // Official Section 5.9: Special Grade Descriptions
+  specialGradeDescriptions: {
+    "I(SE)": "Incomplete: Semester Exam mark < 40 (Assignment Submitted, Exam Repeat Required)",
+    "I(CA)": "Incomplete: Continuous Assessment Assignment Not Submitted (Resubmission Required)",
+    "INC":   "Incomplete: Assignment Not Submitted & Exam mark < 40 (Both Repeat Required)",
+    "DFR":   "Deferred: Absent with Approved / Valid Medical Justification",
+    "AB":    "Absent: Absent from examination without valid justification",
+    "A+":    "Marks 85 - 100 (Grade Point: 4.00)",
+    "A":     "Marks 70 - 84 (Grade Point: 4.00)",
+    "A-":    "Marks 65 - 69 (Grade Point: 3.70)",
+    "B+":    "Marks 60 - 64 (Grade Point: 3.30)",
+    "B":     "Marks 55 - 59 (Grade Point: 3.00)",
+    "B-":    "Marks 50 - 54 (Grade Point: 2.70)",
+    "C+":    "Marks 45 - 49 (Grade Point: 2.30)",
+    "C":     "Marks 40 - 44 (Grade Point: 2.00 - Benchmark Pass)",
+    "C-":    "Marks 35 - 39 (Grade Point: 1.70 - Conditional Pass)",
+    "D+":    "Marks 30 - 34 (Grade Point: 1.30 - Weak Pass)",
+    "D":     "Marks 25 - 29 (Grade Point: 1.00 - Weak Pass)",
+    "E":     "Marks 0 - 24 (Grade Point: 0.00 - Fail)"
   },
 
   // Academic Honours Classification

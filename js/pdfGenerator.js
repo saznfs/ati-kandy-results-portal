@@ -381,6 +381,17 @@ const PortalPdfGenerator = (() => {
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
 
+      // Official SLIATE Grading Scheme Key (Section 5.9 & 5.10)
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(6.2);
+      doc.setTextColor(148, 163, 184);
+      doc.text(
+        "SLIATE Key (5.10): A+/A (4.00), A- (3.70), B+ (3.30), B (3.00), B- (2.70), C+ (2.30), C (2.00 Pass), C- (1.70), D+ (1.30), D (1.00), E (0.00 Fail) • (5.9): I(SE) Exam < 40 | I(CA) CA Missing | DFR Deferred | AB Absent",
+        pageWidth / 2,
+        pageHeight - 15.2,
+        { align: "center" }
+      );
+
       // Footer divider line
       doc.setDrawColor(226, 232, 240);
       doc.setLineWidth(0.3);

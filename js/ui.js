@@ -36,15 +36,21 @@ const PortalUI = (() => {
   }
 
   /**
-   * Returns grade badge CSS class based on grade letter
+   * Returns grade badge CSS class based on grade letter and official SLIATE 5.9 rules
    */
   function getGradeClass(grade) {
     if (!grade) return "grade-E";
-    const letter = grade.trim().charAt(0).toUpperCase();
-    if (letter === "A") return "grade-A";
-    if (letter === "B") return "grade-B";
-    if (letter === "C") return "grade-C";
-    if (letter === "D") return "grade-D";
+    const g = grade.trim().toUpperCase();
+
+    // Check special grades from SLIATE 5.9 first to avoid false-prefix matching (e.g. AB != A, DFR != D)
+    if (g === "AB") return "grade-absent";
+    if (g === "DFR") return "grade-deferred";
+    if (g.startsWith("I(") || g === "INC") return "grade-incomplete";
+
+    if (g.startsWith("A")) return "grade-A";
+    if (g.startsWith("B")) return "grade-B";
+    if (g.startsWith("C")) return "grade-C";
+    if (g.startsWith("D")) return "grade-D";
     return "grade-E";
   }
 
@@ -343,6 +349,9 @@ const PortalUI = (() => {
     courses.forEach(course => {
       const gradeClass = getGradeClass(course.grade);
       const attempt = getAttemptInfo(course);
+      const gradeTooltip = (CONFIG.specialGradeDescriptions && CONFIG.specialGradeDescriptions[course.grade])
+        ? CONFIG.specialGradeDescriptions[course.grade]
+        : `Grade: ${course.grade}`;
 
       const row = el("tr", {},
         el("td", { class: "col-code", "data-label": "Code" },
@@ -352,7 +361,10 @@ const PortalUI = (() => {
           el("span", { class: "course-name" }, course.title || course.name || "-")
         ),
         el("td", { "data-label": "Grade" },
-          el("span", { class: `grade-pill ${gradeClass}` }, course.grade || "-")
+          el("span", {
+            class: `grade-pill ${gradeClass}`,
+            title: gradeTooltip
+          }, course.grade || "-")
         ),
         el("td", { "data-label": "Grade Point" },
           course.gradePoint !== undefined ? Number(course.gradePoint).toFixed(2) : "-"

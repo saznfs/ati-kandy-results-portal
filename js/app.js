@@ -239,6 +239,41 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // 11. Official Grading Scheme Modal Controls (Section 5.9 & 5.10)
+  const gradingModal = document.getElementById("gradingModal");
+  const btnOpenGradingModal = document.getElementById("btnOpenGradingModal");
+  const btnFooterGradingScheme = document.getElementById("btnFooterGradingScheme");
+  const gradingModalCloseBtn = document.getElementById("gradingModalCloseBtn");
+
+  function openGradingModal() {
+    if (!gradingModal) return;
+    gradingModal.classList.add("active");
+    gradingModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeGradingModal() {
+    if (!gradingModal) return;
+    gradingModal.classList.remove("active");
+    gradingModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  if (btnOpenGradingModal) btnOpenGradingModal.addEventListener("click", openGradingModal);
+  if (btnFooterGradingScheme) btnFooterGradingScheme.addEventListener("click", openGradingModal);
+  if (gradingModalCloseBtn) gradingModalCloseBtn.addEventListener("click", closeGradingModal);
+
+  if (gradingModal) {
+    gradingModal.addEventListener("click", (e) => {
+      if (e.target === gradingModal) closeGradingModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && gradingModal.classList.contains("active")) {
+        closeGradingModal();
+      }
+    });
+  }
+
   // Aspect Ratio Buttons (9:16 vs 1:1)
   aspectBtns.forEach(btn => {
     btn.addEventListener("click", () => {

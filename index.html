@@ -79,6 +79,13 @@
       </a>
 
       <div class="header-actions">
+        <!-- Grading System Guide Button -->
+        <button id="btnOpenGradingModal" class="btn-grading-guide" type="button" aria-label="SLIATE Grading System Guide"
+          title="View Official SLIATE Grading System (5.9 & 5.10)">
+          <span aria-hidden="true">📖</span>
+          <span>Grading Scale</span>
+        </button>
+
         <!-- Theme Toggle Button -->
         <button id="themeToggleBtn" class="btn-theme-toggle" type="button" aria-label="Toggle dark/light theme"
           title="Toggle theme">
@@ -222,6 +229,132 @@
     </div>
   </div>
 
+  <!-- Official SLIATE Academic Grading System Modal (Sections 5.9 & 5.10) -->
+  <div id="gradingModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="gradingModalTitle"
+    aria-hidden="true">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <h2 id="gradingModalTitle" class="modal-title">📖 Official SLIATE Academic Grading System</h2>
+        <button type="button" id="gradingModalCloseBtn" class="modal-close-btn" aria-label="Close modal"
+          title="Close modal">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: var(--space-6); overflow-y: auto;">
+        <!-- Section 5.10 Grading System Table -->
+        <div class="grading-modal-section">
+          <h3 class="grading-section-heading">5.10 Grading System</h3>
+          <p class="grading-section-desc">
+            Marks obtained in respect of a course unit are graded according to a twelve-category system shown as follows:
+          </p>
+          <div class="grade-table-wrapper">
+            <table class="grade-table">
+              <thead>
+                <tr>
+                  <th>Range of Marks</th>
+                  <th>Grade</th>
+                  <th>Grade Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>85 – 100</td><td><span class="grade-pill grade-A">A+</span></td><td>4.00</td></tr>
+                <tr><td>70 – 84</td><td><span class="grade-pill grade-A">A</span></td><td>4.00</td></tr>
+                <tr><td>65 – 69</td><td><span class="grade-pill grade-A">A-</span></td><td>3.70</td></tr>
+                <tr><td>60 – 64</td><td><span class="grade-pill grade-B">B+</span></td><td>3.30</td></tr>
+                <tr><td>55 – 59</td><td><span class="grade-pill grade-B">B</span></td><td>3.00</td></tr>
+                <tr><td>50 – 54</td><td><span class="grade-pill grade-B">B-</span></td><td>2.70</td></tr>
+                <tr><td>45 – 49</td><td><span class="grade-pill grade-C">C+</span></td><td>2.30</td></tr>
+                <tr><td>40 – 44</td><td><span class="grade-pill grade-C">C</span></td><td>2.00 (Minimum Pass)</td></tr>
+                <tr><td>35 – 39</td><td><span class="grade-pill grade-D">C-</span></td><td>1.70</td></tr>
+                <tr><td>30 – 34</td><td><span class="grade-pill grade-D">D+</span></td><td>1.30</td></tr>
+                <tr><td>25 – 29</td><td><span class="grade-pill grade-D">D</span></td><td>1.00</td></tr>
+                <tr><td>0 – 24</td><td><span class="grade-pill grade-E">E</span></td><td>0.00 (Fail)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 5.9 All Possible Grades Table -->
+        <div class="grading-modal-section" style="margin-top: 24px;">
+          <h3 class="grading-section-heading">5.9 All Possible Grades & Examination Conditions</h3>
+          <p class="grading-section-desc">
+            Conditions determining examination results based on Continuous Assessment (Assignment) and Semester Examination:
+          </p>
+          <div class="grade-table-wrapper">
+            <table class="grade-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Assignment (CA)</th>
+                  <th>Exam (SE)</th>
+                  <th>Result</th>
+                  <th>Official Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Any Marks</td>
+                  <td>Marks &lt; 40</td>
+                  <td><span class="grade-pill grade-incomplete">I(SE)</span></td>
+                  <td>Exam marks below 40. Repeat examination required.</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Any Marks</td>
+                  <td>Marks &ge; 40</td>
+                  <td><span class="grade-pill grade-A">A+ to C</span></td>
+                  <td>Graded according to the 5.10 Grading System.</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Any Marks</td>
+                  <td>Absent with valid reason</td>
+                  <td><span class="grade-pill grade-deferred">DFR</span></td>
+                  <td>Deferred (Approved medical / valid justification).</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>Any Marks</td>
+                  <td>Absent without valid reason</td>
+                  <td><span class="grade-pill grade-absent">AB</span></td>
+                  <td>Absent without justification (Counts as an attempt).</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>Not Submitted</td>
+                  <td>Marks &ge; 40</td>
+                  <td><span class="grade-pill grade-incomplete">I(CA)</span></td>
+                  <td>Assignment not submitted. CA resubmission required.</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Not Submitted</td>
+                  <td>Marks &lt; 40</td>
+                  <td><span class="grade-pill grade-incomplete">INC</span></td>
+                  <td>Incomplete: Assignment not submitted and Exam &lt; 40.</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Not Submitted</td>
+                  <td>Absent with valid reason</td>
+                  <td><span class="grade-pill grade-incomplete">I(CA)</span></td>
+                  <td>CA not submitted. Resubmission required.</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>Not Submitted</td>
+                  <td>Absent without valid reason</td>
+                  <td><span class="grade-pill grade-absent">AB</span></td>
+                  <td>Absent without valid reason.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="site-footer" role="contentinfo">
     <div class="container">
@@ -230,6 +363,7 @@
           <span>&copy; 2026 SLIATE KANDY. All rights reserved.</span>
         </div>
         <div class="footer-links">
+          <a id="btnFooterGradingScheme" href="javascript:void(0);">Grading System (5.9 & 5.10)</a>
           <a id="reportIssueLink" href="#" target="_blank" rel="noopener noreferrer">Request Issue / Result Removal</a>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub Project</a>
         </div>
