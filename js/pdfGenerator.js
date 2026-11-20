@@ -80,7 +80,7 @@ const PortalPdfGenerator = (() => {
     // --- 2. Candidate Information Box ---
     y += 4;
     const infoBoxTop = y;
-    const infoBoxHeight = 28;
+    const infoBoxHeight = 32;
     doc.setFillColor(248, 250, 252);
     doc.roundedRect(margin, infoBoxTop, pageWidth - (margin * 2), infoBoxHeight, 2, 2, "F");
     doc.setDrawColor(226, 232, 240);
@@ -88,75 +88,75 @@ const PortalPdfGenerator = (() => {
 
     const col1X = margin + 4;
     const col2X = margin + 100;
-    let infoY = infoBoxTop + 5.5;
+    let infoY = infoBoxTop + 6;
 
     // Student Name
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("STUDENT FULL NAME:", col1X, infoY);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.5);
+    doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text(String(student.name || "N/A"), col1X + 38, infoY);
+    doc.text(String(student.name || "N/A"), col1X + 44, infoY);
 
     // Academic Program
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("PROGRAM:", col2X, infoY);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(37, 99, 235);
+    doc.setFontSize(11);
+    doc.setTextColor(29, 78, 216);
     const progText = (student.programCode === "IT" || (student.program && student.program.includes("Information Technology")))
       ? "HNDIT"
       : (CONFIG.programNames[student.programCode] || student.program || "HNDIT");
-    doc.text(doc.splitTextToSize(progText, 70), col2X + 22, infoY);
+    doc.text(doc.splitTextToSize(progText, 70), col2X + 24, infoY);
 
-    infoY += 6.5;
+    infoY += 7.5;
     // Index No
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("INDEX NUMBER:", col1X, infoY);
     doc.setFont("courier", "bold");
-    doc.setFontSize(9);
+    doc.setFontSize(11);
     doc.setTextColor(15, 23, 42);
-    doc.text(String(student.indexNumber || "N/A"), col1X + 38, infoY);
+    doc.text(String(student.indexNumber || "N/A"), col1X + 44, infoY);
 
     // Campus
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("CAMPUS:", col2X, infoY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
     doc.setTextColor(15, 23, 42);
     const campusText = (student.campusCode === "KAN" || (student.campus && student.campus.includes("Kandy")))
       ? "SLIATE Kandy"
       : (CONFIG.campusNames[student.campusCode] || student.campus || "SLIATE Kandy");
-    doc.text(campusText, col2X + 26, infoY);
+    doc.text(campusText, col2X + 24, infoY);
 
-    infoY += 6.5;
+    infoY += 7.5;
     // Academic Year
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("ACADEMIC YEAR:", col1X, infoY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8.5);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
     doc.setTextColor(15, 23, 42);
-    doc.text(String(student.academicYear || "2023/2024"), col1X + 38, infoY);
+    doc.text(String(student.academicYear || "2023/2024"), col1X + 44, infoY);
 
     // Total Semesters
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
     doc.text("TOTAL SEMESTERS:", col2X, infoY);
     doc.setFont("courier", "bold");
-    doc.setFontSize(9);
+    doc.setFontSize(10.5);
     doc.setTextColor(15, 23, 42);
-    doc.text(String(student.semesters ? student.semesters.length : 4), col2X + 34, infoY);
+    doc.text(String(student.semesters ? student.semesters.length : 4), col2X + 38, infoY);
 
     y = infoBoxTop + infoBoxHeight + 5;
 
@@ -166,17 +166,17 @@ const PortalPdfGenerator = (() => {
     semesters.forEach((sem, sIdx) => {
       // Semester Header
       doc.setFillColor(15, 43, 92);
-      doc.roundedRect(margin, y, pageWidth - (margin * 2), 6, 1, 1, "F");
+      doc.roundedRect(margin, y, pageWidth - (margin * 2), 7, 1, 1, "F");
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(8.5);
+      doc.setFontSize(9.5);
       doc.setTextColor(255, 255, 255);
       const semTitle = sem.semesterTitle || `Year ${sem.year} Semester ${sem.semester}`;
-      doc.text(semTitle.toUpperCase(), margin + 3, y + 4.2);
+      doc.text(semTitle.toUpperCase(), margin + 4, y + 4.8);
 
       const semStats = `SGPA: ${Number(sem.sgpa || 0).toFixed(2)}`;
-      doc.text(semStats, pageWidth - margin - 3, y + 4.2, { align: "right" });
+      doc.text(semStats, pageWidth - margin - 4, y + 4.8, { align: "right" });
 
-      y += 6.5;
+      y += 7.5;
 
       // Table rows
       const tableData = (sem.courses || []).map(c => [
@@ -193,24 +193,24 @@ const PortalPdfGenerator = (() => {
         body: tableData,
         theme: "plain",
         styles: {
-          fontSize: 7.5,
-          cellPadding: 1.5,
+          fontSize: 8.5,
+          cellPadding: 2,
           textColor: [15, 23, 42]
         },
         headStyles: {
           fillColor: [241, 245, 249],
-          textColor: [71, 85, 105],
+          textColor: [51, 65, 85],
           fontStyle: "bold",
-          fontSize: 7.5
+          fontSize: 8.5
         },
         alternateRowStyles: {
           fillColor: [248, 250, 252]
         },
         columnStyles: {
-          0: { cellWidth: 28, font: "courier", fontStyle: "bold" },
-          1: { cellWidth: "auto" },
-          2: { cellWidth: 22, halign: "center", fontStyle: "bold" },
-          3: { cellWidth: 22, halign: "center" }
+          0: { cellWidth: 30, font: "courier", fontStyle: "bold", fontSize: 8.5 },
+          1: { cellWidth: "auto", fontSize: 8.5 },
+          2: { cellWidth: 22, halign: "center", fontStyle: "bold", fontSize: 9 },
+          3: { cellWidth: 22, halign: "center", fontSize: 8.5 }
         }
       });
 
@@ -225,27 +225,27 @@ const PortalPdfGenerator = (() => {
     doc.setFillColor(241, 245, 249);
     doc.setDrawColor(37, 99, 235);
     doc.setLineWidth(0.4);
-    doc.roundedRect(margin, y, pageWidth - (margin * 2), 16, 2, 2, "FD");
+    doc.roundedRect(margin, y, pageWidth - (margin * 2), 18, 2, 2, "FD");
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("SEMESTER GPAS", margin + 6, y + 5.5);
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text("SEMESTER GPAS", margin + 6, y + 6);
     doc.setFont("courier", "bold");
-    doc.setFontSize(9.5);
-    doc.setTextColor(37, 99, 235);
-    doc.text(semGpaSummary, margin + 6, y + 11.5);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 116, 139);
-    doc.text("ACADEMIC HONOURS", margin + 115, y + 5.5);
-    doc.setFont("helvetica", "bold");
     doc.setFontSize(10.5);
-    doc.setTextColor(217, 119, 6);
-    doc.text(honours.title.toUpperCase(), margin + 115, y + 11.5);
+    doc.setTextColor(37, 99, 235);
+    doc.text(semGpaSummary, margin + 6, y + 13);
 
-    y += 20;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(71, 85, 105);
+    doc.text("ACADEMIC HONOURS", margin + 115, y + 6);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11.5);
+    doc.setTextColor(217, 119, 6);
+    doc.text(honours.title.toUpperCase(), margin + 115, y + 13);
+
+    y += 22;
 
     // --- 5. Clean Footer ---
     doc.setDrawColor(226, 232, 240);
@@ -253,14 +253,14 @@ const PortalPdfGenerator = (() => {
     doc.line(margin, pageHeight - 16, pageWidth - margin, pageHeight - 16);
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
+    doc.setFontSize(7.5);
     doc.setTextColor(148, 163, 184);
     const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
     doc.text(`SLIATE KANDY • Generated: ${dateStr} • Ref: ${student.indexNumber.replace(/\//g, "-")}`, margin, pageHeight - 10);
     doc.text("Page 1 of 1", pageWidth - margin, pageHeight - 10, { align: "right" });
 
     // Save PDF
-    const filename = `ATI_Result_${student.indexNumber.replace(/[\/\\]/g, "_")}.pdf`;
+    const filename = `SLIATE_KANDY_${student.indexNumber.replace(/[\/\\]/g, "_")}.pdf`;
     doc.save(filename);
   }
 
