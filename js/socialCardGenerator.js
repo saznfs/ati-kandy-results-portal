@@ -824,7 +824,7 @@ const PortalSocialCardGenerator = (() => {
         await navigator.share({
           files: [file],
           title: shareTitle,
-          text: `${shareText}\n${shareUrl}`,
+          text: shareText,
           url: shareUrl
         });
         return;
