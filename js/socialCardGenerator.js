@@ -131,7 +131,7 @@ const PortalSocialCardGenerator = (() => {
    * Helper: Draw Index Number with optional privacy blur
    */
   function drawIndexNumber(cx, cy, indexNumber, fontSize, maxWidth, theme, blur = false) {
-    const rawText = `Index No: ${indexNumber}`;
+    const rawText = `Index No: ${indexNumber || ""}`;
     if (!blur) {
       drawFittedText(
         rawText,
@@ -158,18 +158,21 @@ const PortalSocialCardGenerator = (() => {
     ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
     let wPrefix = ctx.measureText(prefix).width;
     let wValue = ctx.measureText(value).width;
-    const spacingBetween = 6;
-    let totalW = wPrefix + spacingBetween + wValue;
+    const gap = 10;
+    const pillPadX = 12;
+    let pillW = wValue + (pillPadX * 2);
+    let totalVisualW = wPrefix + gap + pillW;
 
-    while (totalW > maxWidth && currentFontSize > 11) {
+    while (totalVisualW > maxWidth && currentFontSize > 11) {
       currentFontSize -= 1;
       ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
       wPrefix = ctx.measureText(prefix).width;
       wValue = ctx.measureText(value).width;
-      totalW = wPrefix + spacingBetween + wValue;
+      pillW = wValue + (pillPadX * 2);
+      totalVisualW = wPrefix + gap + pillW;
     }
 
-    const startX = cx - totalW / 2;
+    const startX = cx - totalVisualW / 2;
 
     // 1. Draw "Index No: " crisp and visible
     ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
@@ -177,15 +180,12 @@ const PortalSocialCardGenerator = (() => {
     ctx.fillStyle = theme.textPrimary;
     ctx.fillText(prefix, startX, cy);
 
-    // 2. Draw frosted privacy pill behind blurred value
-    const valX = startX + wPrefix + spacingBetween;
-    const pillPadX = 8;
-    const pillPadY = 5;
-    const pillX = valX - pillPadX;
-    const pillY = cy - currentFontSize + 2;
-    const pillW = wValue + (pillPadX * 2);
-    const pillH = currentFontSize + (pillPadY * 2);
-    const pillR = Math.min(8, pillH / 2);
+    // 2. Draw frosted privacy pill behind blurred value (perfectly centered vertically & horizontally)
+    const pillX = startX + wPrefix + gap;
+    const pillH = Math.round(currentFontSize * 1.36);
+    const pillY = Math.round((cy - 0.36 * currentFontSize) - (pillH / 2));
+    const pillR = Math.min(8, Math.round(pillH / 2));
+    const valX = pillX + pillPadX;
 
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
@@ -884,9 +884,18 @@ const PortalSocialCardGenerator = (() => {
 
     if (currentStudent) {
       const studentName = currentStudent.name || "Student";
-      const indexNo = blurIndex
-        ? (currentStudent.indexNumber ? currentStudent.indexNumber.replace(/\/[^\/]+$/, "/•••") : "Protected")
-        : (currentStudent.indexNumber || "");
+      let indexNo = currentStudent.indexNumber || "";
+      if (blurIndex && indexNo) {
+        if (indexNo.includes("/")) {
+          indexNo = indexNo.replace(/\/[^\/]+$/, "/•••");
+        } else if (indexNo.length > 3) {
+          indexNo = indexNo.slice(0, -3) + "•••";
+        } else {
+          indexNo = "••••";
+        }
+      } else if (blurIndex && !indexNo) {
+        indexNo = "Protected";
+      }
       const showHonours = currentOptions.showHonours !== false;
       const honours = (showHonours && typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
         ? PortalUI.getHonoursClassification(currentStudent.cgpa)
