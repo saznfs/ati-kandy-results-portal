@@ -158,21 +158,15 @@ const PortalSocialCardGenerator = (() => {
     ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
     let wPrefix = ctx.measureText(prefix).width;
     let wValue = ctx.measureText(value).width;
-    const lockIcon = "🔒";
-    let lockFontSize = Math.round(currentFontSize * 0.75);
-    ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
-    let wLock = ctx.measureText(lockIcon).width + 6;
-    let totalW = wPrefix + wLock + wValue;
+    const spacingBetween = 6;
+    let totalW = wPrefix + spacingBetween + wValue;
 
     while (totalW > maxWidth && currentFontSize > 11) {
       currentFontSize -= 1;
-      lockFontSize = Math.round(currentFontSize * 0.75);
       ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
       wPrefix = ctx.measureText(prefix).width;
       wValue = ctx.measureText(value).width;
-      ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
-      wLock = ctx.measureText(lockIcon).width + 6;
-      totalW = wPrefix + wLock + wValue;
+      totalW = wPrefix + spacingBetween + wValue;
     }
 
     const startX = cx - totalW / 2;
@@ -183,14 +177,8 @@ const PortalSocialCardGenerator = (() => {
     ctx.fillStyle = theme.textPrimary;
     ctx.fillText(prefix, startX, cy);
 
-    // 2. Draw 🔒 lock icon
-    const lockX = startX + wPrefix;
-    ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
-    ctx.fillStyle = theme.gold;
-    ctx.fillText(lockIcon, lockX, cy - 1);
-
-    // 3. Draw frosted privacy pill behind blurred value
-    const valX = lockX + wLock;
+    // 2. Draw frosted privacy pill behind blurred value
+    const valX = startX + wPrefix + spacingBetween;
     const pillPadX = 8;
     const pillPadY = 5;
     const pillX = valX - pillPadX;
@@ -213,7 +201,7 @@ const PortalSocialCardGenerator = (() => {
     ctx.stroke();
     ctx.restore();
 
-    // 4. Draw blurred index text inside pill
+    // 3. Draw blurred index text inside pill
     ctx.save();
     ctx.beginPath();
     if (typeof ctx.roundRect === "function") {
