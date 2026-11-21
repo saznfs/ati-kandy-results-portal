@@ -128,110 +128,31 @@ const PortalSocialCardGenerator = (() => {
   }
 
   /**
-   * Helper: Draw Index Number with optional privacy blur
+   * Helper: Mask index number into privacy format (e.g. "KAN/IT/2324/F/024" -> "xxx/xx/xxxx/x/xxx")
    */
-  function drawIndexNumber(cx, cy, indexNumber, fontSize, maxWidth, theme, blur = false) {
-    const rawText = `Index No: ${indexNumber || ""}`;
-    if (!blur) {
-      drawFittedText(
-        rawText,
-        cx,
-        cy,
-        fontSize,
-        0.5,
-        maxWidth,
-        "'Courier New', monospace",
-        "bold",
-        theme.textPrimary,
-        "center"
-      );
-      return;
-    }
+  function maskIndexNumber(indexNumber) {
+    if (!indexNumber) return "xxx/xx/xxxx/x/xxx";
+    return String(indexNumber).replace(/[^\/]/g, "x");
+  }
 
-    // Blurred Index Rendering for Privacy
-    ctx.save();
-    ctx.textBaseline = "alphabetic";
-    const prefix = "Index No: ";
-    const value = indexNumber || "KAN/IT/2324/F/xxx";
-
-    let currentFontSize = fontSize;
-    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
-    let wPrefix = ctx.measureText(prefix).width;
-    let wValue = ctx.measureText(value).width;
-    const gap = 10;
-    const pillPadX = 12;
-    let pillW = wValue + (pillPadX * 2);
-    let totalVisualW = wPrefix + gap + pillW;
-
-    while (totalVisualW > maxWidth && currentFontSize > 11) {
-      currentFontSize -= 1;
-      ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
-      wPrefix = ctx.measureText(prefix).width;
-      wValue = ctx.measureText(value).width;
-      pillW = wValue + (pillPadX * 2);
-      totalVisualW = wPrefix + gap + pillW;
-    }
-
-    const startX = cx - totalVisualW / 2;
-
-    // 1. Draw "Index No: " crisp and visible
-    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
-    ctx.textAlign = "left";
-    ctx.fillStyle = theme.textPrimary;
-    ctx.fillText(prefix, startX, cy);
-
-    // 2. Draw frosted privacy pill behind blurred value (perfectly centered vertically & horizontally)
-    const pillX = startX + wPrefix + gap;
-    const pillH = Math.round(currentFontSize * 1.36);
-    const pillY = Math.round((cy - 0.36 * currentFontSize) - (pillH / 2));
-    const pillR = Math.min(8, Math.round(pillH / 2));
-    const valX = pillX + pillPadX;
-
-    ctx.save();
-    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-    ctx.strokeStyle = theme.gold;
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    if (typeof ctx.roundRect === "function") {
-      ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
-    } else {
-      ctx.rect(pillX, pillY, pillW, pillH);
-    }
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // 3. Draw blurred index text inside pill
-    ctx.save();
-    ctx.beginPath();
-    if (typeof ctx.roundRect === "function") {
-      ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
-    } else {
-      ctx.rect(pillX, pillY, pillW, pillH);
-    }
-    ctx.clip();
-
-    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
-    ctx.fillStyle = theme.textPrimary;
-    ctx.textAlign = "left";
-
-    // Gaussian blur filter
-    if ("filter" in ctx) {
-      ctx.filter = "blur(9px)";
-    }
-
-    // Draw text with multi-offset spread
-    ctx.fillText(value, valX, cy);
-    const offsets = [[-3, -2], [3, 2], [-2, 2], [2, -2], [0, -3], [0, 3]];
-    offsets.forEach(([dx, dy]) => {
-      ctx.fillText(value, valX + dx, cy + dy);
-    });
-
-    if ("filter" in ctx) {
-      ctx.filter = "none";
-    }
-    ctx.restore();
-    ctx.restore();
+  /**
+   * Helper: Draw Index Number with optional privacy masking
+   */
+  function drawIndexNumber(cx, cy, indexNumber, fontSize, maxWidth, theme, mask = false) {
+    const textValue = mask ? maskIndexNumber(indexNumber) : (indexNumber || "");
+    const rawText = `Index No: ${textValue}`;
+    drawFittedText(
+      rawText,
+      cx,
+      cy,
+      fontSize,
+      0.5,
+      maxWidth,
+      "'Courier New', monospace",
+      "bold",
+      theme.textPrimary,
+      "center"
+    );
   }
 
   /**
@@ -884,18 +805,9 @@ const PortalSocialCardGenerator = (() => {
 
     if (currentStudent) {
       const studentName = currentStudent.name || "Student";
-      let indexNo = currentStudent.indexNumber || "";
-      if (blurIndex && indexNo) {
-        if (indexNo.includes("/")) {
-          indexNo = indexNo.replace(/\/[^\/]+$/, "/•••");
-        } else if (indexNo.length > 3) {
-          indexNo = indexNo.slice(0, -3) + "•••";
-        } else {
-          indexNo = "••••";
-        }
-      } else if (blurIndex && !indexNo) {
-        indexNo = "Protected";
-      }
+      const indexNo = blurIndex
+        ? maskIndexNumber(currentStudent.indexNumber)
+        : (currentStudent.indexNumber || "");
       const showHonours = currentOptions.showHonours !== false;
       const honours = (showHonours && typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
         ? PortalUI.getHonoursClassification(currentStudent.cgpa)
