@@ -302,14 +302,14 @@ const PortalSocialCardGenerator = (() => {
     const height = 1080;
     const maxContentWidth = 920;
 
-    // 1. Header Emblem & Title (Enhanced logo size with clean clearance)
-    drawEmblemBadge(width / 2, 92, theme, 40);
+    // 1. Header Emblem & Title (Clean top border clearance and perfectly aligned emblem)
+    drawEmblemBadge(width / 2, 114, theme, 36);
 
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      168,
-      24,
+      186,
+      22,
       3.5,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -320,8 +320,8 @@ const PortalSocialCardGenerator = (() => {
     // 2. Student Identity Card Box
     const cardMargin = 60;
     const cardWidth = width - (cardMargin * 2); // 960px
-    const cardY = 192;
-    const cardHeight = 154;
+    const cardY = 210;
+    const cardHeight = 146;
 
     drawGlassCard(cardMargin, cardY, cardWidth, cardHeight, 20, theme);
 
@@ -329,8 +329,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       student.name || "Student Name",
       width / 2,
-      cardY + 44,
-      38,
+      cardY + 41,
+      36,
       -0.5,
       cardWidth - 50,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -344,8 +344,8 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       `${progText}  •  ${campusText}`,
       width / 2,
-      cardY + 82,
-      22,
+      cardY + 78,
+      21,
       0.5,
       cardWidth - 60,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -356,7 +356,7 @@ const PortalSocialCardGenerator = (() => {
     // Index Number (Large, high-contrast monospace with optional privacy blur)
     drawIndexNumber(
       width / 2,
-      cardY + 122,
+      cardY + 116,
       student.indexNumber,
       22,
       cardWidth - 60,
@@ -366,22 +366,22 @@ const PortalSocialCardGenerator = (() => {
 
     // 3. Honours Classification Banner (Conditional)
     const showHonours = currentOptions.showHonours !== false;
-    let gridTitleY = 438;
-    let gridY = 460;
-    let rowH = 184;
+    let gridTitleY = 444;
+    let gridY = 464;
+    let rowH = 176;
 
     if (showHonours) {
       const honours = PortalUI.getHonoursClassification(student.cgpa);
       const bannerW = 640;
-      const bannerH = 46;
-      const bannerY = 364;
-      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 23, theme, true);
+      const bannerH = 44;
+      const bannerY = 370;
+      drawGlassCard((width - bannerW) / 2, bannerY, bannerW, bannerH, 22, theme, true);
 
       drawFittedText(
         `★  ${honours.title.toUpperCase()}  ★`,
         width / 2,
-        bannerY + 31,
-        20,
+        bannerY + 29,
+        19,
         1.5,
         bannerW - 30,
         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -390,9 +390,9 @@ const PortalSocialCardGenerator = (() => {
       );
     } else {
       // Re-balance grid coordinates when honours banner is hidden
-      gridTitleY = 372;
-      gridY = 398;
-      rowH = 214;
+      gridTitleY = 380;
+      gridY = 402;
+      rowH = 206;
     }
 
     // 4. All Semester GPAs Showcase (2x2 Grid)
@@ -400,7 +400,7 @@ const PortalSocialCardGenerator = (() => {
       "ACADEMIC SEMESTER GPA",
       width / 2,
       gridTitleY,
-      18,
+      17,
       3,
       maxContentWidth,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -416,7 +416,7 @@ const PortalSocialCardGenerator = (() => {
       const col = i % 2;
       const row = Math.floor(i / 2);
       const cx = gridX + col * (colW + 24);
-      const cy = gridY + row * (rowH + 16);
+      const cy = gridY + row * (rowH + 14);
 
       const s = sems[i];
       const semLabel = s ? `YEAR ${s.year} • SEMESTER ${s.semester}` : `SEMESTER ${i + 1}`;
@@ -428,8 +428,8 @@ const PortalSocialCardGenerator = (() => {
       drawFittedText(
         semLabel,
         cx + colW / 2,
-        cy + (showHonours ? 38 : 44),
-        20,
+        cy + (showHonours ? 36 : 42),
+        19,
         1,
         colW - 30,
         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -442,33 +442,34 @@ const PortalSocialCardGenerator = (() => {
       ctx.strokeStyle = theme.cardBorder;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(cx + 35, cy + (showHonours ? 52 : 60));
-      ctx.lineTo(cx + colW - 35, cy + (showHonours ? 52 : 60));
+      ctx.moveTo(cx + 35, cy + (showHonours ? 50 : 58));
+      ctx.lineTo(cx + colW - 35, cy + (showHonours ? 50 : 58));
       ctx.stroke();
       ctx.restore();
 
       // Large GPA value (Huge & bold)
       ctx.textAlign = "center";
       ctx.fillStyle = theme.gold;
-      ctx.font = `900 ${showHonours ? "64px" : "70px"} 'Courier New', monospace`;
-      ctx.fillText(semGpa, cx + colW / 2, cy + (showHonours ? 122 : 138));
+      ctx.font = `900 ${showHonours ? "62px" : "68px"} 'Courier New', monospace`;
+      ctx.fillText(semGpa, cx + colW / 2, cy + (showHonours ? 118 : 134));
 
       // Semester GPA Label
       ctx.fillStyle = theme.textSecondary;
       ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + (showHonours ? 154 : 176));
+      ctx.fillText("SEMESTER GPA", cx + colW / 2, cy + (showHonours ? 148 : 168));
     }
 
     // 5. Milestone Pill
     const semCount = sems.length > 0 ? sems.length : 4;
-    const statPillY = 878;
+    const statPillY = 854;
     const statPillW = 540;
-    drawGlassCard((width - statPillW) / 2, statPillY, statPillW, 46, 23, theme);
+    const statPillH = 44;
+    drawGlassCard((width - statPillW) / 2, statPillY, statPillW, statPillH, 22, theme);
     drawFittedText(
       `Completed Semesters: ${semCount}`,
       width / 2,
-      statPillY + 30,
-      20,
+      statPillY + 29,
+      19,
       1,
       statPillW - 40,
       "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -480,7 +481,7 @@ const PortalSocialCardGenerator = (() => {
     drawFittedText(
       "SLIATE KANDY",
       width / 2,
-      975,
+      958,
       19,
       3.5,
       maxContentWidth,
