@@ -335,8 +335,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const chkModal = document.getElementById("chkModalHonours");
     if (chkModal) chkModal.checked = showHonours;
 
+    const chkModalBlur = document.getElementById("chkModalBlurIndex");
+    const blurIndex = chkModalBlur ? chkModalBlur.checked : false;
+
     // Render initial canvas
-    PortalSocialCardGenerator.render(currentStudentData, { showHonours });
+    PortalSocialCardGenerator.render(currentStudentData, { showHonours, blurIndex });
   }
 
   function closeSocialModal() {
@@ -431,6 +434,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
       PortalSocialCardGenerator.render(currentStudentData, { showHonours });
+    });
+  }
+
+  // Privacy Option: Blur Index Toggle inside Modal
+  const chkModalBlurIndex = document.getElementById("chkModalBlurIndex");
+  if (chkModalBlurIndex) {
+    chkModalBlurIndex.addEventListener("change", () => {
+      const blurIndex = chkModalBlurIndex.checked;
+      PortalSocialCardGenerator.render(currentStudentData, { blurIndex });
     });
   }
 

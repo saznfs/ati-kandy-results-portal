@@ -25,7 +25,8 @@ const PortalSocialCardGenerator = (() => {
   const currentOptions = {
     aspectRatio: "9:16", // "9:16" or "1:1"
     theme: "navy",        // "navy", "emerald", "onyx", "crimson"
-    showHonours: true    // true or false
+    showHonours: true,   // true or false
+    blurIndex: false     // true or false
   };
 
   const THEMES = {
@@ -124,6 +125,125 @@ const PortalSocialCardGenerator = (() => {
     ctx.fillText(text, x, y);
     ctx.restore();
     return fontSize;
+  }
+
+  /**
+   * Helper: Draw Index Number with optional privacy blur
+   */
+  function drawIndexNumber(cx, cy, indexNumber, fontSize, maxWidth, theme, blur = false) {
+    const rawText = `Index No: ${indexNumber}`;
+    if (!blur) {
+      drawFittedText(
+        rawText,
+        cx,
+        cy,
+        fontSize,
+        0.5,
+        maxWidth,
+        "'Courier New', monospace",
+        "bold",
+        theme.textPrimary,
+        "center"
+      );
+      return;
+    }
+
+    // Blurred Index Rendering for Privacy
+    ctx.save();
+    ctx.textBaseline = "alphabetic";
+    const prefix = "Index No: ";
+    const value = indexNumber || "KAN/IT/2324/F/xxx";
+
+    let currentFontSize = fontSize;
+    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
+    let wPrefix = ctx.measureText(prefix).width;
+    let wValue = ctx.measureText(value).width;
+    const lockIcon = "🔒";
+    let lockFontSize = Math.round(currentFontSize * 0.75);
+    ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
+    let wLock = ctx.measureText(lockIcon).width + 6;
+    let totalW = wPrefix + wLock + wValue;
+
+    while (totalW > maxWidth && currentFontSize > 11) {
+      currentFontSize -= 1;
+      lockFontSize = Math.round(currentFontSize * 0.75);
+      ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
+      wPrefix = ctx.measureText(prefix).width;
+      wValue = ctx.measureText(value).width;
+      ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
+      wLock = ctx.measureText(lockIcon).width + 6;
+      totalW = wPrefix + wLock + wValue;
+    }
+
+    const startX = cx - totalW / 2;
+
+    // 1. Draw "Index No: " crisp and visible
+    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
+    ctx.textAlign = "left";
+    ctx.fillStyle = theme.textPrimary;
+    ctx.fillText(prefix, startX, cy);
+
+    // 2. Draw 🔒 lock icon
+    const lockX = startX + wPrefix;
+    ctx.font = `bold ${lockFontSize}px -apple-system, sans-serif`;
+    ctx.fillStyle = theme.gold;
+    ctx.fillText(lockIcon, lockX, cy - 1);
+
+    // 3. Draw frosted privacy pill behind blurred value
+    const valX = lockX + wLock;
+    const pillPadX = 8;
+    const pillPadY = 5;
+    const pillX = valX - pillPadX;
+    const pillY = cy - currentFontSize + 2;
+    const pillW = wValue + (pillPadX * 2);
+    const pillH = currentFontSize + (pillPadY * 2);
+    const pillR = Math.min(8, pillH / 2);
+
+    ctx.save();
+    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.strokeStyle = theme.gold;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") {
+      ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
+    } else {
+      ctx.rect(pillX, pillY, pillW, pillH);
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    // 4. Draw blurred index text inside pill
+    ctx.save();
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") {
+      ctx.roundRect(pillX, pillY, pillW, pillH, pillR);
+    } else {
+      ctx.rect(pillX, pillY, pillW, pillH);
+    }
+    ctx.clip();
+
+    ctx.font = `bold ${currentFontSize}px 'Courier New', monospace`;
+    ctx.fillStyle = theme.textPrimary;
+    ctx.textAlign = "left";
+
+    // Gaussian blur filter
+    if ("filter" in ctx) {
+      ctx.filter = "blur(9px)";
+    }
+
+    // Draw text with multi-offset spread
+    ctx.fillText(value, valX, cy);
+    const offsets = [[-3, -2], [3, 2], [-2, 2], [2, -2], [0, -3], [0, 3]];
+    offsets.forEach(([dx, dy]) => {
+      ctx.fillText(value, valX + dx, cy + dy);
+    });
+
+    if ("filter" in ctx) {
+      ctx.filter = "none";
+    }
+    ctx.restore();
+    ctx.restore();
   }
 
   /**
@@ -233,17 +353,15 @@ const PortalSocialCardGenerator = (() => {
       theme.accent
     );
 
-    // Index Number (Large, high-contrast monospace)
-    drawFittedText(
-      `Index No: ${student.indexNumber}`,
+    // Index Number (Large, high-contrast monospace with optional privacy blur)
+    drawIndexNumber(
       width / 2,
       cardY + 122,
+      student.indexNumber,
       22,
-      0.5,
       cardWidth - 60,
-      "'Courier New', monospace",
-      "bold",
-      theme.textPrimary
+      theme,
+      currentOptions.blurIndex
     );
 
     // 3. Honours Classification Banner (Conditional)
@@ -431,17 +549,15 @@ const PortalSocialCardGenerator = (() => {
       theme.accent
     );
 
-    // Index Number (High contrast)
-    drawFittedText(
-      `Index No: ${student.indexNumber}`,
+    // Index Number (High contrast with optional privacy blur)
+    drawIndexNumber(
       width / 2,
       cardY + 150,
+      student.indexNumber,
       24,
-      0.5,
       cardWidth - 60,
-      "'Courier New', monospace",
-      "bold",
-      theme.textPrimary
+      theme,
+      currentOptions.blurIndex
     );
 
     // 3. Honours Banner (Conditional)
@@ -748,9 +864,10 @@ const PortalSocialCardGenerator = (() => {
     }
 
     const link = document.createElement("a");
-    const namePart = (currentStudent && currentStudent.indexNumber)
+    const blurIndex = currentOptions.blurIndex === true;
+    const namePart = (currentStudent && currentStudent.indexNumber && !blurIndex)
       ? currentStudent.indexNumber.replace(/[\/\\]/g, "_")
-      : "result";
+      : (blurIndex ? "Card" : "result");
     const aspectPart = currentOptions.aspectRatio === "9:16" ? "Story_9x16" : "Post_1x1";
 
     link.download = `SLIATE_KANDY_${namePart}_${aspectPart}.png`;
@@ -766,9 +883,10 @@ const PortalSocialCardGenerator = (() => {
   async function shareCard() {
     if (!canvas) return;
 
-    const namePart = (currentStudent && currentStudent.indexNumber)
+    const blurIndex = currentOptions.blurIndex === true;
+    const namePart = (currentStudent && currentStudent.indexNumber && !blurIndex)
       ? currentStudent.indexNumber.replace(/[\/\\]/g, "_")
-      : "result";
+      : (blurIndex ? "Card" : "result");
     const aspectPart = currentOptions.aspectRatio === "9:16" ? "Story" : "Post";
     const fileName = `SLIATE_KANDY_${namePart}_${aspectPart}.png`;
     
@@ -777,7 +895,9 @@ const PortalSocialCardGenerator = (() => {
 
     if (currentStudent) {
       const studentName = currentStudent.name || "Student";
-      const indexNo = currentStudent.indexNumber || "";
+      const indexNo = blurIndex
+        ? (currentStudent.indexNumber ? currentStudent.indexNumber.replace(/\/[^\/]+$/, "/•••") : "Protected")
+        : (currentStudent.indexNumber || "");
       const showHonours = currentOptions.showHonours !== false;
       const honours = (showHonours && typeof PortalUI !== "undefined" && PortalUI.getHonoursClassification)
         ? PortalUI.getHonoursClassification(currentStudent.cgpa)
@@ -801,8 +921,10 @@ const PortalSocialCardGenerator = (() => {
     let shareUrl = window.location.href;
     try {
       const urlObj = new URL(window.location.href);
-      if (currentStudent && currentStudent.indexNumber) {
+      if (currentStudent && currentStudent.indexNumber && !blurIndex) {
         urlObj.searchParams.set("index", currentStudent.indexNumber);
+      } else {
+        urlObj.searchParams.delete("index");
       }
       shareUrl = urlObj.toString();
     } catch (e) {
